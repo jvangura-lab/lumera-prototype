@@ -36,9 +36,16 @@ function SingleServicePicker() {
     return () => clearTimeout(t);
   }, [search]);
 
-  const filtered = useMemo(() => {
-    if (!debounced) return SERVICE_CATEGORIES;
+  const sourceCategories = useMemo(() => {
+    if (state.bookingType !== BOOKING_TYPES.CONSULT) return SERVICE_CATEGORIES;
     return SERVICE_CATEGORIES
+      .map((c) => ({ ...c, services: c.services.filter((s) => s.consultRequired) }))
+      .filter((c) => c.services.length > 0);
+  }, [state.bookingType]);
+
+  const filtered = useMemo(() => {
+    if (!debounced) return sourceCategories;
+    return sourceCategories
       .map((c) => ({
         ...c,
         services: c.services.filter(
@@ -48,7 +55,7 @@ function SingleServicePicker() {
         ),
       }))
       .filter((c) => c.services.length > 0);
-  }, [debounced]);
+  }, [debounced, sourceCategories]);
 
   const autoExpanded = useMemo(() => {
     if (debounced) return new Set(filtered.map((c) => c.id));
@@ -87,9 +94,14 @@ function SingleServicePicker() {
     if (!pending) return;
     const svc = findServiceById(pending);
     if (!svc) return;
-    if (svc.consultRequired) {
+    if (state.bookingType === BOOKING_TYPES.CONSULT) {
+      // CONSULT path skips the returning gate — patient explicitly wants to book a consultation.
+      actions.goTo(STEPS.CONSULT_FORMAT);
+    } else if (svc.consultRequired) {
+      // SINGLE consult-required → returning gate.
       actions.goTo(STEPS.RETURNING);
     } else {
+      // SINGLE direct-bookable → straight to practitioner.
       actions.goTo(STEPS.PRACTITIONER);
     }
   };

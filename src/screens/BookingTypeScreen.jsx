@@ -7,7 +7,7 @@ import { useBooking, STEPS, BOOKING_TYPES } from '../state/BookingContext.jsx';
 
 const OPTIONS = [
   { id: BOOKING_TYPES.CONSULT, title: 'Book a consultation', subtitle: 'Meet a practitioner first.' },
-  { id: BOOKING_TYPES.SINGLE,  title: 'Book a single service', subtitle: 'Direct booking.' },
+  { id: BOOKING_TYPES.SINGLE,  title: 'Book a single service', subtitle: 'Already had a consult? Skip ahead.' },
   { id: BOOKING_TYPES.SERIES,  title: 'Book a session series', subtitle: 'Multi-session package.' },
 ];
 

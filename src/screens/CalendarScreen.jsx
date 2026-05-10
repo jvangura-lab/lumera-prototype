@@ -39,12 +39,14 @@ export default function CalendarScreen() {
       slot: pick.slot,
       practitionerId: pick.practitionerId,
     });
-    if (state.bookingType === BOOKING_TYPES.SERIES && isConsult) {
-      // Consult booked first; series scheduling next
-      actions.goTo(STEPS.SERIES_FIRST);
-    } else if (isConsult && state.bookingType !== BOOKING_TYPES.SERIES) {
+    if (state.bookingType === BOOKING_TYPES.SERIES) {
+      // Series routed-to-consult new patient: book the consult only, no series scheduling, no same-day.
+      actions.goTo(STEPS.INTAKE);
+    } else if (isConsult) {
+      // CONSULT or SINGLE+consult-required+new → same-day procedure offer.
       actions.goTo(STEPS.SAME_DAY);
     } else {
+      // SINGLE direct or returning-patient direct → intake.
       actions.goTo(STEPS.INTAKE);
     }
   };

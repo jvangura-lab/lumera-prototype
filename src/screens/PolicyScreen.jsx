@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import ScreenChrome from '../components/ScreenChrome.jsx';
 import { PrimaryButton } from '../components/Button.jsx';
-import { useBooking, STEPS, BOOKING_TYPES } from '../state/BookingContext.jsx';
+import { useBooking, STEPS, BOOKING_TYPES, isSeriesScheduled } from '../state/BookingContext.jsx';
 import { findPractitionerById, PLACEHOLDERS, FEES } from '../mockData.js';
 import { formatPrice } from '../utils/formatting.js';
 
 export default function PolicyScreen() {
   const { state, actions } = useBooking();
   const [ack, setAck] = useState(state.policyAck || false);
-  const isSeries = state.bookingType === BOOKING_TYPES.SERIES;
+  const isSeries = isSeriesScheduled(state);
   const sameDay = state.sameDay === true;
   const cardOnFile = !sameDay; // sameDay path covers payment via the deposit policy
   const practitioner = findPractitionerById(

@@ -32,19 +32,12 @@ export default function ReturningPatientScreen() {
 
   const handleContinue = () => {
     if (pending === null) return;
-    if (state.bookingType === BOOKING_TYPES.SERIES) {
-      // Series-with-consult-required path: route consult-style for new patients
-      if (pending) {
-        actions.goTo(STEPS.PRACTITIONER);
-      } else {
-        actions.goTo(STEPS.CONSULT_FORMAT);
-      }
+    if (pending) {
+      // Returning → skip consult, go straight to practitioner.
+      actions.goTo(STEPS.PRACTITIONER);
     } else {
-      if (pending) {
-        actions.goTo(STEPS.PRACTITIONER);
-      } else {
-        actions.goTo(STEPS.CONSULT_FORMAT);
-      }
+      // New patient → clarifying screen, then consultation flow.
+      actions.goTo(STEPS.CLARIFY);
     }
   };
 

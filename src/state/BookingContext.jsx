@@ -102,6 +102,7 @@ export function deriveFlow(state) {
         STEPS.BOOKING_TYPE,
         STEPS.SERVICE,
         STEPS.RETURNING,
+        STEPS.CLARIFY,
         STEPS.CONSULT_FORMAT,
         STEPS.PRACTITIONER,
         STEPS.CALENDAR,
@@ -111,41 +112,46 @@ export function deriveFlow(state) {
         STEPS.CHECKOUT,
         STEPS.CONFIRMATION,
       ],
-      maxLen: 11,
+      maxLen: 12,
     };
   }
 
   path.push(STEPS.SERVICE);
 
-  if (bookingType === BOOKING_TYPES.SERIES) {
-    if (!series) {
-      path.push(STEPS.RETURNING, STEPS.CONSULT_FORMAT, STEPS.PRACTITIONER, STEPS.CALENDAR,
-        STEPS.SERIES_FIRST, STEPS.SERIES_SCHEDULE, STEPS.SERIES_REVIEW);
-    } else if (series.consultRequired) {
-      path.push(STEPS.RETURNING);
-      if (returningPatient === false) {
-        path.push(STEPS.CONSULT_FORMAT, STEPS.PRACTITIONER, STEPS.CALENDAR);
-      } else {
-        path.push(STEPS.PRACTITIONER);
-      }
-      path.push(STEPS.SERIES_FIRST, STEPS.SERIES_SCHEDULE, STEPS.SERIES_REVIEW);
-    } else {
-      path.push(STEPS.PRACTITIONER, STEPS.SERIES_FIRST, STEPS.SERIES_SCHEDULE, STEPS.SERIES_REVIEW);
-    }
-  } else {
-    // SINGLE or CONSULT — the service's consultRequired flag is the source of truth.
-    // Direct-bookable services always skip RETURNING / CONSULT_FORMAT / SAME_DAY.
+  if (bookingType === BOOKING_TYPES.CONSULT) {
+    // No returning gate — patient explicitly chose to book a consultation.
+    path.push(STEPS.CONSULT_FORMAT, STEPS.PRACTITIONER, STEPS.CALENDAR, STEPS.SAME_DAY);
+  } else if (bookingType === BOOKING_TYPES.SINGLE) {
     if (!service) {
-      // Service not yet picked. Show worst case so progress bar doesn't shrink unexpectedly.
-      path.push(STEPS.RETURNING, STEPS.CONSULT_FORMAT, STEPS.PRACTITIONER, STEPS.CALENDAR, STEPS.SAME_DAY);
+      path.push(STEPS.RETURNING, STEPS.CLARIFY, STEPS.CONSULT_FORMAT, STEPS.PRACTITIONER, STEPS.CALENDAR, STEPS.SAME_DAY);
     } else if (!service.consultRequired) {
+      // Direct-bookable: no gate, no consult.
       path.push(STEPS.PRACTITIONER, STEPS.CALENDAR);
     } else {
+      // Consult-required service.
       path.push(STEPS.RETURNING);
       if (returningPatient === true) {
         path.push(STEPS.PRACTITIONER, STEPS.CALENDAR);
       } else {
-        path.push(STEPS.CONSULT_FORMAT, STEPS.PRACTITIONER, STEPS.CALENDAR, STEPS.SAME_DAY);
+        // new (or undecided) → clarifying screen, then consultation flow.
+        path.push(STEPS.CLARIFY, STEPS.CONSULT_FORMAT, STEPS.PRACTITIONER, STEPS.CALENDAR, STEPS.SAME_DAY);
+      }
+    }
+  } else if (bookingType === BOOKING_TYPES.SERIES) {
+    if (!series) {
+      path.push(STEPS.RETURNING, STEPS.PRACTITIONER, STEPS.SERIES_FIRST, STEPS.SERIES_SCHEDULE, STEPS.SERIES_REVIEW);
+    } else if (!series.consultRequired) {
+      path.push(STEPS.PRACTITIONER, STEPS.SERIES_FIRST, STEPS.SERIES_SCHEDULE, STEPS.SERIES_REVIEW);
+    } else {
+      path.push(STEPS.RETURNING);
+      if (returningPatient === true) {
+        path.push(STEPS.PRACTITIONER, STEPS.SERIES_FIRST, STEPS.SERIES_SCHEDULE, STEPS.SERIES_REVIEW);
+      } else if (returningPatient === false) {
+        // New patient: routed to consult-only flow. The series itself isn't scheduled.
+        path.push(STEPS.CLARIFY, STEPS.CONSULT_FORMAT, STEPS.PRACTITIONER, STEPS.CALENDAR);
+      } else {
+        // Default to series path while user hasn't answered yet.
+        path.push(STEPS.PRACTITIONER, STEPS.SERIES_FIRST, STEPS.SERIES_SCHEDULE, STEPS.SERIES_REVIEW);
       }
     }
   }
@@ -155,15 +161,23 @@ export function deriveFlow(state) {
 }
 
 export function isConsultFlow(state) {
-  // True when the patient is on a consultation path (not a direct booking, not a returning-patient skip).
-  if (state.returningPatient === true) return false;
+  // True when this booking represents a consultation visit (not a direct booking, not a returning-patient skip).
+  if (state.bookingType === BOOKING_TYPES.CONSULT) return true;
+  if (state.bookingType === BOOKING_TYPES.SINGLE) {
+    if (state.returningPatient === true) return false;
+    const svc = state.serviceId ? findServiceById(state.serviceId) : null;
+    if (!svc || !svc.consultRequired) return false;
+    return state.returningPatient === false;
+  }
   if (state.bookingType === BOOKING_TYPES.SERIES) {
     const pkg = state.seriesId ? findSeriesById(state.seriesId) : null;
     return !!(pkg && pkg.consultRequired && state.returningPatient === false);
   }
-  const svc = state.serviceId ? findServiceById(state.serviceId) : null;
-  if (!svc) return false;
-  return !!svc.consultRequired;
+  return false;
+}
+
+export function isSeriesScheduled(state) {
+  return state.bookingType === BOOKING_TYPES.SERIES && (state.series?.sessions?.length || 0) > 0;
 }
 
 export function stepLabel(step) {
@@ -172,6 +186,7 @@ export function stepLabel(step) {
     case STEPS.SERVICE: return 'Service';
     case STEPS.RETURNING: return 'Patient';
     case STEPS.CONSULT_FORMAT: return 'Format';
+    case STEPS.CLARIFY: return 'Heads-up';
     case STEPS.PRACTITIONER: return 'Provider';
     case STEPS.CALENDAR: return 'Time';
     case STEPS.SERIES_FIRST: return 'Session 1';

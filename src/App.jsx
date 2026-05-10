@@ -8,6 +8,7 @@ import BookingTypeScreen from './screens/BookingTypeScreen.jsx';
 import ServiceSelectScreen from './screens/ServiceSelectScreen.jsx';
 import ReturningPatientScreen from './screens/ReturningPatientScreen.jsx';
 import ConsultFormatScreen from './screens/ConsultFormatScreen.jsx';
+import ClarifyConsultScreen from './screens/ClarifyConsultScreen.jsx';
 import PractitionerScreen from './screens/PractitionerScreen.jsx';
 import CalendarScreen from './screens/CalendarScreen.jsx';
 import SeriesFirstScreen from './screens/SeriesFirstScreen.jsx';
@@ -24,6 +25,7 @@ const SCREENS = {
   [STEPS.SERVICE]: ServiceSelectScreen,
   [STEPS.RETURNING]: ReturningPatientScreen,
   [STEPS.CONSULT_FORMAT]: ConsultFormatScreen,
+  [STEPS.CLARIFY]: ClarifyConsultScreen,
   [STEPS.PRACTITIONER]: PractitionerScreen,
   [STEPS.CALENDAR]: CalendarScreen,
   [STEPS.SERIES_FIRST]: SeriesFirstScreen,

@@ -1,8 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { CreditCard, Lock } from 'lucide-react';
 import ScreenChrome from '../components/ScreenChrome.jsx';
 import { PrimaryButton } from '../components/Button.jsx';
-import { useBooking, STEPS, BOOKING_TYPES, isConsultFlow } from '../state/BookingContext.jsx';
+import { useBooking, STEPS, BOOKING_TYPES, isConsultFlow, isSeriesScheduled } from '../state/BookingContext.jsx';
 import { findServiceById, findSeriesById, FEES } from '../mockData.js';
 import { formatPrice, formatCardNumber, formatExpiry } from '../utils/formatting.js';
 
@@ -47,10 +47,7 @@ export default function CheckoutScreen() {
   };
 
   return (
-    <ScreenChrome
-      title={scenario.heading}
-      subtitle={scenario.subtitle}
-    >
+    <ScreenChrome title={scenario.heading}>
       <OrderSummary state={state} scenario={scenario} />
 
       <form onSubmit={handleSubmit} className="space-y-3">
@@ -138,25 +135,22 @@ function detectBrand(number) {
 }
 
 function deriveScenario(state) {
-  const isSeries = state.bookingType === BOOKING_TYPES.SERIES;
-  if (isSeries) {
+  // True series booking (not series-routed-to-consult).
+  if (isSeriesScheduled(state)) {
     return {
       kind: 'series',
       amountToday: 0,
-      heading: 'Save card and book your series.',
-      subtitle: 'No charge today. The spa bills per the package terms.',
+      heading: 'Save card and book.',
       buttonLabel: 'Save Card and Book Series',
     };
   }
-  const isConsult = isConsultFlow(state);
-  if (isConsult) {
+  if (isConsultFlow(state)) {
     if (state.sameDay) {
       const total = FEES.consultation + FEES.sameDayDeposit;
       return {
         kind: 'consult+sameday',
         amountToday: total,
         heading: `Pay ${formatPrice(total)} and book.`,
-        subtitle: 'Consultation fee plus same-day deposit.',
         buttonLabel: `Pay ${formatPrice(total)} and Book`,
       };
     }
@@ -164,7 +158,6 @@ function deriveScenario(state) {
       kind: 'consult',
       amountToday: FEES.consultation,
       heading: `Pay ${formatPrice(FEES.consultation)} and book.`,
-      subtitle: 'Card will also be saved on file.',
       buttonLabel: `Pay ${formatPrice(FEES.consultation)} and Book`,
     };
   }
@@ -172,52 +165,66 @@ function deriveScenario(state) {
     kind: 'direct',
     amountToday: 0,
     heading: 'Save card and book.',
-    subtitle: 'No charge today. The spa bills after your visit.',
     buttonLabel: 'Save Card and Book',
   };
 }
 
 function OrderSummary({ state, scenario }) {
   const lines = [];
-  if (state.bookingType === BOOKING_TYPES.SERIES && state.seriesId) {
+  let chargedToday = scenario.amountToday;
+  let belowNote = '';
+
+  if (scenario.kind === 'series') {
     const pkg = findSeriesById(state.seriesId);
-    lines.push({ label: `${pkg.name} Series — ${pkg.sessions} sessions`, value: formatPrice(pkg.totalPrice), muted: true });
-    lines.push({ label: `(${formatPrice(pkg.perSessionPrice)}/session, save ${formatPrice(pkg.savings)})`, value: '', tiny: true });
-    lines.push({ label: 'Today', value: formatPrice(0) });
+    lines.push({ label: pkg.name, value: formatPrice(pkg.totalPrice) });
+    lines.push({ label: `${pkg.sessions} sessions · ${formatPrice(pkg.perSessionPrice)}/session`, sub: true });
+    belowNote = 'Your card will be securely held on file. The med spa will bill for the series per their package terms.';
   } else if (scenario.kind === 'consult') {
     lines.push({ label: 'Consultation fee', value: formatPrice(FEES.consultation) });
-    lines.push({ label: 'Card on file', value: 'No charge today', muted: true });
-    lines.push({ label: 'Today', value: formatPrice(FEES.consultation), bold: true });
+    belowNote = 'Card will also be saved on file for any post-visit charges from your appointment.';
   } else if (scenario.kind === 'consult+sameday') {
     lines.push({ label: 'Consultation fee', value: formatPrice(FEES.consultation) });
-    lines.push({ label: 'Same-day deposit', value: formatPrice(FEES.sameDayDeposit) });
-    lines.push({ label: 'Today', value: formatPrice(FEES.consultation + FEES.sameDayDeposit), bold: true });
+    lines.push({ label: 'Same-day procedure deposit', value: formatPrice(FEES.sameDayDeposit) });
+    belowNote = 'Card will also be saved on file for any post-visit charges.';
   } else {
+    // direct service booking
     const svc = state.serviceId ? findServiceById(state.serviceId) : null;
-    if (svc) lines.push({ label: svc.name, value: formatPrice(svc.price), muted: true });
-    lines.push({ label: 'Today', value: formatPrice(0), bold: true });
-    lines.push({ label: 'Card held on file', value: '', muted: true, tiny: true });
+    if (svc) {
+      lines.push({ label: svc.name, value: formatPrice(svc.price) });
+      belowNote = `Your card will be securely held on file. The med spa will charge ${formatPrice(svc.price)} after your visit.`;
+    } else {
+      belowNote = 'Your card will be securely held on file. The med spa will charge after your visit.';
+    }
   }
 
   return (
-    <div className="rounded-xl border border-cream-200 bg-cream-50 p-3 text-sm">
-      <div className="text-[10px] uppercase tracking-[0.16em] text-ink-500 mb-2">Order summary</div>
-      <div className="space-y-1.5">
-        {lines.map((l, i) => (
-          <div
-            key={i}
-            className={
-              'flex items-center justify-between ' +
-              (l.bold ? 'font-semibold text-espresso-900 pt-1.5 border-t border-cream-200' : '') +
-              (l.muted ? ' text-ink-500' : '') +
-              (l.tiny ? ' text-[11px]' : '')
-            }
-          >
-            <span>{l.label}</span>
-            <span className="num">{l.value}</span>
-          </div>
-        ))}
+    <div className="space-y-2">
+      <div className="rounded-xl border border-cream-200 bg-cream-50 p-4 text-sm">
+        <div className="text-[10px] uppercase tracking-[0.16em] text-ink-500 font-semibold mb-3">
+          Order summary
+        </div>
+        <div className="space-y-1.5">
+          {lines.map((l, i) => (
+            <div
+              key={i}
+              className={
+                'flex items-baseline justify-between ' +
+                (l.sub ? 'text-[11px] text-ink-500' : 'text-ink-700')
+              }
+            >
+              <span>{l.label}</span>
+              {l.value && <span className="num">{l.value}</span>}
+            </div>
+          ))}
+        </div>
+        <div className="mt-3 pt-2.5 border-t border-cream-200 flex items-baseline justify-between font-semibold text-espresso-900">
+          <span>Charged today</span>
+          <span className="num">{formatPrice(chargedToday)}</span>
+        </div>
       </div>
+      {belowNote && (
+        <p className="text-[12px] text-ink-500 leading-relaxed px-1">{belowNote}</p>
+      )}
     </div>
   );
 }

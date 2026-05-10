@@ -4,7 +4,7 @@ import { CalendarPlus, CheckCircle2, RefreshCw } from 'lucide-react';
 import ScreenChrome from '../components/ScreenChrome.jsx';
 import { PrimaryButton, GhostButton } from '../components/Button.jsx';
 import EmailPreview from '../components/EmailPreview.jsx';
-import { useBooking, BOOKING_TYPES, isConsultFlow } from '../state/BookingContext.jsx';
+import { useBooking, BOOKING_TYPES, isConsultFlow, isSeriesScheduled } from '../state/BookingContext.jsx';
 import { findServiceById, findSeriesById, findPractitionerById, PLACEHOLDERS, FEES } from '../mockData.js';
 import { formatPrice } from '../utils/formatting.js';
 import { formatSlotLabel } from '../utils/availability.js';
@@ -12,7 +12,10 @@ import { buildIcs, downloadIcs, appointmentDateTime, endDateTime } from '../util
 
 export default function ConfirmationScreen() {
   const { state, actions } = useBooking();
-  const isSeries = state.bookingType === BOOKING_TYPES.SERIES;
+  const isSeries = isSeriesScheduled(state);
+  // Series booking type but no sessions scheduled = patient was new and routed to consult-only.
+  const isSeriesRoutedToConsult =
+    state.bookingType === BOOKING_TYPES.SERIES && !isSeries;
   const sessions = state.series?.sessions || [];
   const apt = state.appointment;
   const practitioner = findPractitionerById(
@@ -125,7 +128,9 @@ export default function ConfirmationScreen() {
             <div>
               <div className="text-[10px] uppercase tracking-[0.16em] text-gold-600 mb-0.5">Your visit</div>
               <div className="font-display text-xl" style={{ fontWeight: 600 }}>
-                {isConsult ? `Consultation${service ? ` — ${service.name}` : ''}` : service?.name}
+                {isConsult
+                  ? `Consultation${(isSeriesRoutedToConsult ? ` — ${series?.name}` : (service ? ` — ${service.name}` : ''))}`
+                  : service?.name}
               </div>
               <div className="text-xs text-ink-500">with {practitioner?.name}</div>
             </div>
@@ -136,6 +141,11 @@ export default function ConfirmationScreen() {
                 <div className="text-[11px] text-ink-500 mt-1">
                   {isConsult ? (state.consultFormat === 'virtual' ? 'Virtual' : 'In-Person') : 'In-Person'} · {PLACEHOLDERS.spaName} · {PLACEHOLDERS.spaAddress}
                 </div>
+              </div>
+            )}
+            {isSeriesRoutedToConsult && series && (
+              <div className="text-[12px] text-gold-600 bg-gold-300/10 rounded-md px-2 py-1.5">
+                After your consultation, you can schedule your {series.name} series.
               </div>
             )}
             {sameDay && (
@@ -188,7 +198,8 @@ function PaymentSummary({ state }) {
 }
 
 function PatientEmail({ state }) {
-  const isSeries = state.bookingType === BOOKING_TYPES.SERIES;
+  const isSeries = isSeriesScheduled(state);
+  const isSeriesRoutedToConsult = state.bookingType === BOOKING_TYPES.SERIES && !isSeries;
   const sessions = state.series?.sessions || [];
   const apt = state.appointment;
   const practitioner = findPractitionerById(
@@ -237,6 +248,9 @@ function PatientEmail({ state }) {
           {state.sameDay && (
             <p>You've reserved a same-day procedure slot. Your $150 deposit is held.</p>
           )}
+          {isSeriesRoutedToConsult && series && (
+            <p>After your visit, you can schedule your <strong>{series.name}</strong> series ({series.sessions} sessions).</p>
+          )}
         </>
       )}
       <p>Location: {PLACEHOLDERS.spaName}, {PLACEHOLDERS.spaAddress}</p>
@@ -254,7 +268,8 @@ function PatientEmail({ state }) {
 }
 
 function SpaEmail({ state }) {
-  const isSeries = state.bookingType === BOOKING_TYPES.SERIES;
+  const isSeries = isSeriesScheduled(state);
+  const isSeriesRoutedToConsult = state.bookingType === BOOKING_TYPES.SERIES && !isSeries;
   const sessions = state.series?.sessions || [];
   const apt = state.appointment;
   const practitioner = findPractitionerById(
@@ -293,10 +308,15 @@ function SpaEmail({ state }) {
           )}
         </>
       ) : (
-        <p>
-          Service: {service?.name || 'Consultation'} with {practitioner?.name}<br />
-          When: {apt && format(parseISO(apt.dateIso), 'EEE, MMM d, yyyy')} · {apt && formatSlotLabel(apt.slot)} (ET)
-        </p>
+        <>
+          <p>
+            {isSeriesRoutedToConsult ? `Consultation for ${series?.name} series` : `Service: ${service?.name || 'Consultation'}`} with {practitioner?.name}<br />
+            When: {apt && format(parseISO(apt.dateIso), 'EEE, MMM d, yyyy')} · {apt && formatSlotLabel(apt.slot)} (ET)
+          </p>
+          {isSeriesRoutedToConsult && (
+            <p>Note: New patient — series scheduling pending consultation outcome.</p>
+          )}
+        </>
       )}
       {state.sameDay && <p>Same-day procedure: deposit paid (${FEES.sameDayDeposit}).</p>}
       {state.payment && (
