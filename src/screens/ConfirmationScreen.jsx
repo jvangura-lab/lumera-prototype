@@ -4,7 +4,7 @@ import { CalendarPlus, CheckCircle2, RefreshCw } from 'lucide-react';
 import ScreenChrome from '../components/ScreenChrome.jsx';
 import { PrimaryButton, GhostButton } from '../components/Button.jsx';
 import EmailPreview from '../components/EmailPreview.jsx';
-import { useBooking, BOOKING_TYPES } from '../state/BookingContext.jsx';
+import { useBooking, BOOKING_TYPES, isConsultFlow } from '../state/BookingContext.jsx';
 import { findServiceById, findSeriesById, findPractitionerById, PLACEHOLDERS, FEES } from '../mockData.js';
 import { formatPrice } from '../utils/formatting.js';
 import { formatSlotLabel } from '../utils/availability.js';
@@ -21,10 +21,7 @@ export default function ConfirmationScreen() {
   const service = state.serviceId ? findServiceById(state.serviceId) : null;
   const series = state.seriesId ? findSeriesById(state.seriesId) : null;
 
-  const isConsult =
-    state.bookingType === BOOKING_TYPES.CONSULT ||
-    (state.bookingType === BOOKING_TYPES.SINGLE && state.returningPatient === false) ||
-    (isSeries && state.returningPatient === false);
+  const isConsult = isConsultFlow(state);
   const sameDay = state.sameDay === true;
   const payment = state.payment;
 
@@ -199,10 +196,7 @@ function PatientEmail({ state }) {
   );
   const service = state.serviceId ? findServiceById(state.serviceId) : null;
   const series = state.seriesId ? findSeriesById(state.seriesId) : null;
-  const isConsult =
-    state.bookingType === BOOKING_TYPES.CONSULT ||
-    (state.bookingType === BOOKING_TYPES.SINGLE && state.returningPatient === false) ||
-    (isSeries && state.returningPatient === false);
+  const isConsult = isConsultFlow(state);
 
   return (
     <EmailPreview

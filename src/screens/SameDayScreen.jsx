@@ -21,28 +21,27 @@ export default function SameDayScreen() {
     actions.goTo(STEPS.INTAKE);
   };
 
+  const subtitle =
+    practitioner && service
+      ? `If ${practitioner.name} approves, we can perform ${service.name} right after your consult. ${formatPrice(FEES.sameDayDeposit)} deposit secures the slot.`
+      : `If approved at your consult, we can perform the procedure right after. ${formatPrice(FEES.sameDayDeposit)} deposit secures the slot.`;
+
   return (
     <ScreenChrome
-      eyebrow="Same-day option"
-      title="Want your procedure done the same day?"
-      subtitle={
-        practitioner && service
-          ? `If ${practitioner.name} approves you for ${service.name} during your consultation, we can perform it the same day. A ${formatPrice(FEES.sameDayDeposit)} deposit secures the slot.`
-          : `If your practitioner approves the procedure during your consultation, we can perform it the same day. A ${formatPrice(FEES.sameDayDeposit)} deposit secures the slot.`
-      }
+      title="Want it done the same day?"
+      subtitle={subtitle}
       footer={<PrimaryButton onClick={handleContinue} disabled={pending === null || pending === undefined}>Continue</PrimaryButton>}
     >
       <SelectCard
         selected={pending === true}
         onClick={() => handleSelect(true)}
-        title={`Yes, reserve same-day procedure (${formatPrice(FEES.sameDayDeposit)} deposit)`}
-        subtitle="We'll hold time on the schedule for the procedure right after your consult."
+        title="Yes, reserve same-day procedure"
+        subtitle={`${formatPrice(FEES.sameDayDeposit)} deposit`}
       />
       <SelectCard
         selected={pending === false}
         onClick={() => handleSelect(false)}
         title="No, just the consultation"
-        subtitle="You can always book the procedure separately later."
       />
     </ScreenChrome>
   );

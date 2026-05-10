@@ -96,8 +96,7 @@ function SingleServicePicker() {
 
   return (
     <ScreenChrome
-      title="Choose a service"
-      subtitle="Browse by category or search."
+      title="Choose a service."
       footer={<PrimaryButton onClick={handleContinue} disabled={!pending}>Continue</PrimaryButton>}
     >
       <div className="sticky top-0 z-10 -mx-5 px-5 py-2 bg-white">
@@ -163,14 +162,10 @@ function SingleServicePicker() {
                           <div className="font-medium text-sm text-ink-900">{s.name}</div>
                           <div className="text-[11px] text-ink-500 mt-0.5 num">
                             {formatDuration(s.duration)} · {formatPrice(s.price)}
-                          </div>
-                          <div className="text-[11px] mt-1">
-                            {s.consultRequired ? (
-                              <span className={'px-1.5 py-0.5 rounded ' + (s.inPersonOnlyConsult ? 'bg-blush-100 text-blush-500' : 'bg-cream-200 text-ink-700')}>
+                            {s.consultRequired && (
+                              <> · <span className={s.inPersonOnlyConsult ? 'text-blush-500' : 'text-ink-700'}>
                                 {s.inPersonOnlyConsult ? 'Consultation required (in-person only)' : 'Consultation required'}
-                              </span>
-                            ) : (
-                              <span className="px-1.5 py-0.5 rounded bg-gold-300/30 text-gold-600">Direct booking</span>
+                              </span></>
                             )}
                           </div>
                         </div>
@@ -239,11 +234,9 @@ function SeriesPicker() {
 
   return (
     <ScreenChrome
-      title="Choose a series package"
-      subtitle="Pre-paid packages with smart spacing."
+      title="Choose a series package."
       footer={<PrimaryButton onClick={handleContinue} disabled={!pending}>Continue</PrimaryButton>}
     >
-      <div className="text-[10px] uppercase tracking-[0.18em] text-gold-600 -mb-1">Series Packages</div>
       {SERIES_PACKAGES.map((p) => {
         const sel = pending === p.id;
         return (
@@ -272,13 +265,11 @@ function SeriesPicker() {
                   <span className="text-ink-500 num"> · {formatPrice(p.perSessionPrice)}/session</span>
                   <span className="ml-2 text-[11px] num px-1.5 py-0.5 rounded bg-gold-300/30 text-gold-600">save {formatPrice(p.savings)}</span>
                 </div>
-                <div className="text-[11px] mt-2">
-                  {p.consultRequired ? (
-                    <span className="px-1.5 py-0.5 rounded bg-cream-200 text-ink-700">Consultation required before first session</span>
-                  ) : (
-                    <span className="px-1.5 py-0.5 rounded bg-gold-300/30 text-gold-600">No consultation required</span>
-                  )}
-                </div>
+                {p.consultRequired && (
+                  <div className="text-[11px] mt-2 text-ink-700">
+                    Consultation required before first session
+                  </div>
+                )}
               </div>
               <span
                 className={

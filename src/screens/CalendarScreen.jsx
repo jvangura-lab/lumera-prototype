@@ -3,8 +3,7 @@ import { format, parseISO } from 'date-fns';
 import ScreenChrome from '../components/ScreenChrome.jsx';
 import { PrimaryButton } from '../components/Button.jsx';
 import Calendar from '../components/Calendar.jsx';
-import { useBooking, STEPS, BOOKING_TYPES, getActivePractitionerIds } from '../state/BookingContext.jsx';
-import { findServiceById, findSeriesById, findPractitionerById } from '../mockData.js';
+import { useBooking, STEPS, BOOKING_TYPES, getActivePractitionerIds, isConsultFlow } from '../state/BookingContext.jsx';
 
 export default function CalendarScreen() {
   const { state, actions } = useBooking();
@@ -31,23 +30,7 @@ export default function CalendarScreen() {
     }
   }, [state.consultFormat]);
 
-  const isConsult =
-    state.bookingType === BOOKING_TYPES.CONSULT ||
-    (state.bookingType === BOOKING_TYPES.SINGLE && state.returningPatient === false) ||
-    (state.bookingType === BOOKING_TYPES.SERIES && state.returningPatient === false);
-
-  let headerTag = '';
-  if (isConsult) {
-    headerTag = `Consultation • ${state.consultFormat === 'virtual' ? 'Virtual' : 'In-Person'}`;
-  } else {
-    let svcName = '';
-    if (state.bookingType === BOOKING_TYPES.SERIES && state.seriesId) {
-      svcName = findSeriesById(state.seriesId)?.name || '';
-    } else if (state.serviceId) {
-      svcName = findServiceById(state.serviceId)?.name || '';
-    }
-    headerTag = `Service • ${svcName}`;
-  }
+  const isConsult = isConsultFlow(state);
 
   const handleContinue = () => {
     if (!pick) return;
@@ -56,12 +39,10 @@ export default function CalendarScreen() {
       slot: pick.slot,
       practitionerId: pick.practitionerId,
     });
-    if (state.bookingType === BOOKING_TYPES.SERIES && state.returningPatient === false) {
-      // After consult is booked, route to series scheduling — we use SERIES_FIRST as the next step
-      // so user picks first session date. (Consult is captured in state.appointment.)
+    if (state.bookingType === BOOKING_TYPES.SERIES && isConsult) {
+      // Consult booked first; series scheduling next
       actions.goTo(STEPS.SERIES_FIRST);
-    } else if (state.bookingType === BOOKING_TYPES.CONSULT ||
-              (state.bookingType === BOOKING_TYPES.SINGLE && state.returningPatient === false)) {
+    } else if (isConsult && state.bookingType !== BOOKING_TYPES.SERIES) {
       actions.goTo(STEPS.SAME_DAY);
     } else {
       actions.goTo(STEPS.INTAKE);
@@ -70,9 +51,7 @@ export default function CalendarScreen() {
 
   return (
     <ScreenChrome
-      eyebrow={headerTag}
-      title="Pick your time"
-      subtitle={firstAvailable ? 'Tap a slot to see which practitioner you\'ll be matched with.' : 'All times Eastern Time.'}
+      title="Pick a time."
       footer={<PrimaryButton onClick={handleContinue} disabled={!pick}>Continue</PrimaryButton>}
     >
       {formatChangedBanner && (

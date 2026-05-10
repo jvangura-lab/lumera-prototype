@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { CreditCard, Lock } from 'lucide-react';
 import ScreenChrome from '../components/ScreenChrome.jsx';
 import { PrimaryButton } from '../components/Button.jsx';
-import { useBooking, STEPS, BOOKING_TYPES } from '../state/BookingContext.jsx';
+import { useBooking, STEPS, BOOKING_TYPES, isConsultFlow } from '../state/BookingContext.jsx';
 import { findServiceById, findSeriesById, FEES } from '../mockData.js';
 import { formatPrice, formatCardNumber, formatExpiry } from '../utils/formatting.js';
 
@@ -48,7 +48,6 @@ export default function CheckoutScreen() {
 
   return (
     <ScreenChrome
-      eyebrow="Secure checkout"
       title={scenario.heading}
       subtitle={scenario.subtitle}
     >
@@ -144,39 +143,36 @@ function deriveScenario(state) {
     return {
       kind: 'series',
       amountToday: 0,
-      heading: 'Save card and book your series',
-      subtitle: 'No charge today. The med spa will bill for the series per their package terms.',
+      heading: 'Save card and book your series.',
+      subtitle: 'No charge today. The spa bills per the package terms.',
       buttonLabel: 'Save Card and Book Series',
     };
   }
-  const isConsult =
-    state.bookingType === BOOKING_TYPES.CONSULT ||
-    (state.bookingType === BOOKING_TYPES.SINGLE && state.returningPatient === false);
+  const isConsult = isConsultFlow(state);
   if (isConsult) {
     if (state.sameDay) {
       const total = FEES.consultation + FEES.sameDayDeposit;
       return {
         kind: 'consult+sameday',
         amountToday: total,
-        heading: `Pay ${formatPrice(total)} and book`,
-        subtitle: 'Includes consultation fee and same-day procedure deposit.',
+        heading: `Pay ${formatPrice(total)} and book.`,
+        subtitle: 'Consultation fee plus same-day deposit.',
         buttonLabel: `Pay ${formatPrice(total)} and Book`,
       };
     }
     return {
       kind: 'consult',
       amountToday: FEES.consultation,
-      heading: `Pay ${formatPrice(FEES.consultation)} and book`,
-      subtitle: 'Consultation fee due today. Card will also be saved on file.',
+      heading: `Pay ${formatPrice(FEES.consultation)} and book.`,
+      subtitle: 'Card will also be saved on file.',
       buttonLabel: `Pay ${formatPrice(FEES.consultation)} and Book`,
     };
   }
-  // Direct service or returning-patient direct
   return {
     kind: 'direct',
     amountToday: 0,
-    heading: 'Save card on file',
-    subtitle: 'No charge today. Your card is held on file; the med spa will bill after your visit.',
+    heading: 'Save card and book.',
+    subtitle: 'No charge today. The spa bills after your visit.',
     buttonLabel: 'Save Card and Book',
   };
 }

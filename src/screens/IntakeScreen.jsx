@@ -87,11 +87,10 @@ export default function IntakeScreen() {
 
   return (
     <ScreenChrome
-      eyebrow="Tell us about you"
-      title="Your details"
-      subtitle="We'll use this for your visit and confirmation. * required."
+      title="Your details."
+      subtitle="* required"
     >
-      <form onSubmit={handleSubmit} className="space-y-3" noValidate>
+      <form onSubmit={handleSubmit} className="space-y-2.5" noValidate>
         <Field label="Full name" required error={touched.fullName && errors.fullName}>
           <input
             ref={refs.fullName}

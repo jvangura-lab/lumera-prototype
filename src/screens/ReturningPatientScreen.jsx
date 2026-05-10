@@ -49,15 +49,11 @@ export default function ReturningPatientScreen() {
   };
 
   const isSeries = state.bookingType === BOOKING_TYPES.SERIES;
-  const headline = isSeries
-    ? 'Have you had a consultation with us for this service in the last 12 months?'
-    : 'Have you had a consultation with us for this service in the last 12 months?';
 
   return (
     <ScreenChrome
-      eyebrow="A quick check"
-      title={headline}
-      subtitle="This helps us route you to the right next step. Self-attested — no records will be looked up."
+      title="Have you had a consultation in the last 12 months?"
+      subtitle="If yes, you can skip the consult and book directly."
       footer={<PrimaryButton onClick={handleContinue} disabled={pending === null}>Continue</PrimaryButton>}
     >
       <SelectCard

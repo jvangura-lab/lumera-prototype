@@ -6,9 +6,9 @@ import ConfirmDialog from '../components/ConfirmDialog.jsx';
 import { useBooking, STEPS, BOOKING_TYPES } from '../state/BookingContext.jsx';
 
 const OPTIONS = [
-  { id: BOOKING_TYPES.CONSULT, title: 'Book a consultation', subtitle: 'Meet with a practitioner to plan your treatment.' },
-  { id: BOOKING_TYPES.SINGLE,  title: 'Book a single service', subtitle: 'Already know what you want? Book it directly.' },
-  { id: BOOKING_TYPES.SERIES,  title: 'Book a session series', subtitle: 'Schedule a multi-session package in one go.' },
+  { id: BOOKING_TYPES.CONSULT, title: 'Book a consultation', subtitle: 'Meet a practitioner first.' },
+  { id: BOOKING_TYPES.SINGLE,  title: 'Book a single service', subtitle: 'Direct booking.' },
+  { id: BOOKING_TYPES.SERIES,  title: 'Book a session series', subtitle: 'Multi-session package.' },
 ];
 
 export default function BookingTypeScreen() {
@@ -42,9 +42,7 @@ export default function BookingTypeScreen() {
 
   return (
     <ScreenChrome
-      eyebrow="Welcome"
       title="How would you like to book?"
-      subtitle="Choose the type of visit that fits you best."
       hideBack
       footer={<PrimaryButton onClick={handleContinue} disabled={!pending}>Continue</PrimaryButton>}
     >

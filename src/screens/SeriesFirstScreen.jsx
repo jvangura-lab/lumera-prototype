@@ -46,9 +46,8 @@ export default function SeriesFirstScreen() {
 
   return (
     <ScreenChrome
-      eyebrow={`Session 1 of ${pkg.sessions} — Choose your start date`}
-      title={pkg.name + ' Series'}
-      subtitle={`${pkg.spacingLabel}. Total ${pkg.sessions} sessions.`}
+      title={`Pick session 1 of ${pkg.sessions}.`}
+      subtitle={pkg.spacingLabel}
       footer={<PrimaryButton onClick={handleContinue} disabled={!pick}>Continue</PrimaryButton>}
     >
       <Calendar

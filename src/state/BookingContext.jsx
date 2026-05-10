@@ -94,7 +94,6 @@ export function deriveFlow(state) {
   const service = serviceId ? findServiceById(serviceId) : null;
   const series = seriesId ? findSeriesById(seriesId) : null;
 
-  // Determine the path of steps that will be visited
   const path = [STEPS.BOOKING_TYPE];
 
   if (!bookingType) {
@@ -119,53 +118,29 @@ export function deriveFlow(state) {
   path.push(STEPS.SERVICE);
 
   if (bookingType === BOOKING_TYPES.SERIES) {
-    if (series && series.consultRequired) {
-      // Returning gate appears
+    if (!series) {
+      path.push(STEPS.RETURNING, STEPS.CONSULT_FORMAT, STEPS.PRACTITIONER, STEPS.CALENDAR,
+        STEPS.SERIES_FIRST, STEPS.SERIES_SCHEDULE, STEPS.SERIES_REVIEW);
+    } else if (series.consultRequired) {
       path.push(STEPS.RETURNING);
       if (returningPatient === false) {
-        // New patient — would route to consult flow first; in the prototype we keep it clean:
-        // we still route them to format -> practitioner -> calendar (the consult), then series scheduling.
-        path.push(STEPS.CONSULT_FORMAT);
-        path.push(STEPS.PRACTITIONER);
-        path.push(STEPS.CALENDAR);
-      } else if (returningPatient === true) {
-        path.push(STEPS.PRACTITIONER);
-        path.push(STEPS.SERIES_FIRST);
-        path.push(STEPS.SERIES_SCHEDULE);
-        path.push(STEPS.SERIES_REVIEW);
+        path.push(STEPS.CONSULT_FORMAT, STEPS.PRACTITIONER, STEPS.CALENDAR);
       } else {
         path.push(STEPS.PRACTITIONER);
-        path.push(STEPS.SERIES_FIRST);
-        path.push(STEPS.SERIES_SCHEDULE);
-        path.push(STEPS.SERIES_REVIEW);
       }
+      path.push(STEPS.SERIES_FIRST, STEPS.SERIES_SCHEDULE, STEPS.SERIES_REVIEW);
     } else {
-      // Direct series
-      path.push(STEPS.PRACTITIONER);
-      path.push(STEPS.SERIES_FIRST);
-      path.push(STEPS.SERIES_SCHEDULE);
-      path.push(STEPS.SERIES_REVIEW);
+      path.push(STEPS.PRACTITIONER, STEPS.SERIES_FIRST, STEPS.SERIES_SCHEDULE, STEPS.SERIES_REVIEW);
     }
   } else {
-    // single or consult
-    const wantsConsult = bookingType === BOOKING_TYPES.CONSULT;
-    const consultRequired = service ? service.consultRequired : true;
-
-    if (bookingType === BOOKING_TYPES.SINGLE) {
-      if (!consultRequired) {
-        // Direct service
-        path.push(STEPS.PRACTITIONER, STEPS.CALENDAR);
-      } else {
-        // Single service that requires consult — use returning-patient gate
-        path.push(STEPS.RETURNING);
-        if (returningPatient === true) {
-          path.push(STEPS.PRACTITIONER, STEPS.CALENDAR);
-        } else {
-          path.push(STEPS.CONSULT_FORMAT, STEPS.PRACTITIONER, STEPS.CALENDAR, STEPS.SAME_DAY);
-        }
-      }
+    // SINGLE or CONSULT — the service's consultRequired flag is the source of truth.
+    // Direct-bookable services always skip RETURNING / CONSULT_FORMAT / SAME_DAY.
+    if (!service) {
+      // Service not yet picked. Show worst case so progress bar doesn't shrink unexpectedly.
+      path.push(STEPS.RETURNING, STEPS.CONSULT_FORMAT, STEPS.PRACTITIONER, STEPS.CALENDAR, STEPS.SAME_DAY);
+    } else if (!service.consultRequired) {
+      path.push(STEPS.PRACTITIONER, STEPS.CALENDAR);
     } else {
-      // CONSULT booking type explicitly
       path.push(STEPS.RETURNING);
       if (returningPatient === true) {
         path.push(STEPS.PRACTITIONER, STEPS.CALENDAR);
@@ -177,6 +152,18 @@ export function deriveFlow(state) {
 
   path.push(STEPS.INTAKE, STEPS.POLICY, STEPS.CHECKOUT, STEPS.CONFIRMATION);
   return { path, maxLen: path.length };
+}
+
+export function isConsultFlow(state) {
+  // True when the patient is on a consultation path (not a direct booking, not a returning-patient skip).
+  if (state.returningPatient === true) return false;
+  if (state.bookingType === BOOKING_TYPES.SERIES) {
+    const pkg = state.seriesId ? findSeriesById(state.seriesId) : null;
+    return !!(pkg && pkg.consultRequired && state.returningPatient === false);
+  }
+  const svc = state.serviceId ? findServiceById(state.serviceId) : null;
+  if (!svc) return false;
+  return !!svc.consultRequired;
 }
 
 export function stepLabel(step) {

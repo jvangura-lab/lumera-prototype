@@ -4,12 +4,20 @@ import ScreenChrome from '../components/ScreenChrome.jsx';
 import { PrimaryButton } from '../components/Button.jsx';
 import ConfirmDialog from '../components/ConfirmDialog.jsx';
 import Avatar from '../components/Avatar.jsx';
-import { useBooking, STEPS, BOOKING_TYPES, getQualifyingPractitioners } from '../state/BookingContext.jsx';
+import { useBooking, STEPS, BOOKING_TYPES, getQualifyingPractitioners, isConsultFlow } from '../state/BookingContext.jsx';
+import { findServiceById, findSeriesById } from '../mockData.js';
 
 export default function PractitionerScreen() {
   const { state, actions } = useBooking();
   const qualifying = getQualifyingPractitioners(state);
   const onlyOne = qualifying.length === 1;
+
+  let serviceName = '';
+  if (state.bookingType === BOOKING_TYPES.SERIES && state.seriesId) {
+    serviceName = findSeriesById(state.seriesId)?.name || '';
+  } else if (state.serviceId) {
+    serviceName = findServiceById(state.serviceId)?.name || '';
+  }
 
   const [pending, setPending] = useState(() => {
     if (state.practitionerId) return state.practitionerId;
@@ -40,8 +48,7 @@ export default function PractitionerScreen() {
   const handleContinue = () => {
     if (!pending) return;
     if (state.bookingType === BOOKING_TYPES.SERIES) {
-      // Direct series → schedule first session. Series-with-consult new patients go to consult calendar first.
-      const isNewSeriesConsult = state.bookingType === BOOKING_TYPES.SERIES && state.returningPatient === false;
+      const isNewSeriesConsult = isConsultFlow(state);
       if (isNewSeriesConsult) {
         actions.goTo(STEPS.CALENDAR);
       } else {
@@ -52,11 +59,15 @@ export default function PractitionerScreen() {
     }
   };
 
+  const title = onlyOne ? 'Confirm your practitioner.' : 'Who would you like to see?';
+  const subtitle = onlyOne
+    ? `${serviceName} is offered by ${qualifying[0].name}.`
+    : 'Pick a practitioner or let us match the soonest opening.';
+
   return (
     <ScreenChrome
-      eyebrow="Choose your practitioner"
-      title="Who would you like to see?"
-      subtitle={onlyOne ? 'Only practitioner available for this service.' : 'Pick a specific practitioner — or let us match the soonest opening.'}
+      title={title}
+      subtitle={subtitle}
       footer={<PrimaryButton onClick={handleContinue} disabled={!pending}>Continue</PrimaryButton>}
     >
       {!onlyOne && (
@@ -65,7 +76,7 @@ export default function PractitionerScreen() {
           onClick={() => handleSelect('first-available')}
           aria-pressed={pending === 'first-available'}
           className={
-            'w-full text-left rounded-xl border p-4 transition flex items-start gap-3 ' +
+            'w-full text-left rounded-xl border p-3 transition flex items-start gap-3 ' +
             (pending === 'first-available'
               ? 'border-gold-400 bg-blush-100/60 shadow-soft'
               : 'border-cream-200 bg-white hover:border-blush-300 hover:bg-cream-50')
@@ -76,7 +87,7 @@ export default function PractitionerScreen() {
           </div>
           <div className="flex-1">
             <div className="font-display text-lg leading-tight" style={{ fontWeight: 600 }}>First available</div>
-            <div className="text-xs text-ink-500 mt-0.5">Match me with the soonest opening across qualifying practitioners.</div>
+            <div className="text-xs text-ink-500 mt-0.5">Soonest opening across practitioners.</div>
           </div>
           <span
             className={
@@ -90,6 +101,8 @@ export default function PractitionerScreen() {
 
       {qualifying.map((p) => {
         const sel = pending === p.id;
+        const shown = p.specialties.slice(0, 4).join(', ');
+        const more = p.specialties.length > 4 ? ' & more' : '';
         return (
           <button
             key={p.id}
@@ -97,7 +110,7 @@ export default function PractitionerScreen() {
             onClick={() => handleSelect(p.id)}
             aria-pressed={sel}
             className={
-              'w-full text-left rounded-xl border p-4 transition flex items-start gap-3 ' +
+              'w-full text-left rounded-xl border p-3 transition flex items-start gap-3 ' +
               (sel
                 ? 'border-gold-400 bg-blush-100/60 shadow-soft'
                 : 'border-cream-200 bg-white hover:border-blush-300 hover:bg-cream-50')
@@ -105,10 +118,11 @@ export default function PractitionerScreen() {
           >
             <Avatar initials={p.initials} accent={p.accent} size="lg" />
             <div className="flex-1 min-w-0">
-              <div className="font-display text-lg leading-tight" style={{ fontWeight: 600 }}>{p.name}</div>
-              <div className="text-[11px] text-ink-500 mt-0.5">{p.credentials}</div>
-              <div className="text-xs text-ink-700 mt-1.5 leading-snug">{p.specialtiesShort}</div>
-              <div className="text-[11px] text-ink-500 mt-1 italic leading-snug">{p.bio}</div>
+              <div className="font-display text-base leading-tight" style={{ fontWeight: 600 }}>
+                {p.name}, {p.credentials}
+              </div>
+              <div className="text-[12px] text-ink-700 mt-0.5 leading-snug">{shown}{more}</div>
+              <div className="text-[11px] text-ink-500 mt-0.5 italic">{p.bio}</div>
             </div>
             <span
               className={

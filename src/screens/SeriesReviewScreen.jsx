@@ -36,21 +36,10 @@ export default function SeriesReviewScreen() {
 
   return (
     <ScreenChrome
-      eyebrow="Final review"
-      title="Review your series"
-      subtitle={`${pkg.sessions} sessions with ${practitioner?.name}. Tap any session to edit before confirming.`}
-      footer={<PrimaryButton onClick={handleContinue}>Looks good — continue</PrimaryButton>}
+      title="Review your series."
+      subtitle={`${pkg.sessions} sessions with ${practitioner?.name}. Tap to edit.`}
+      footer={<PrimaryButton onClick={handleContinue}>Confirm series</PrimaryButton>}
     >
-      <div className="rounded-xl border border-cream-200 bg-cream-50 p-3 text-sm">
-        <div className="flex items-center justify-between">
-          <span className="font-medium">{pkg.name} Package</span>
-          <span className="num font-semibold">{formatPrice(pkg.totalPrice)}</span>
-        </div>
-        <div className="text-[11px] text-ink-500 num">
-          {formatPrice(pkg.perSessionPrice)}/session · save {formatPrice(pkg.savings)}
-        </div>
-      </div>
-
       <div className="space-y-2">
         {sessions.map((s, idx) => {
           const date = parseISO(s.dateIso);

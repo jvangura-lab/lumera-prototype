@@ -83,10 +83,9 @@ export default function SeriesScheduleScreen() {
 
   return (
     <ScreenChrome
-      eyebrow="Smart Spacing"
-      title="Your suggested schedule"
-      subtitle={`${pkg.sessions} sessions with ${practitioner?.name || 'your practitioner'}. ${pkg.spacingLabel}. Edit any session within ±2 weeks.`}
-      footer={<PrimaryButton onClick={handleContinue}>Looks good — continue</PrimaryButton>}
+      title="Your suggested schedule."
+      subtitle={`${pkg.sessions} sessions with ${practitioner?.name || 'your practitioner'}. Edit any session within ±2 weeks.`}
+      footer={<PrimaryButton onClick={handleContinue}>Continue</PrimaryButton>}
     >
       <div className="space-y-2">
         {sessions.map((s, idx) => {

@@ -34,9 +34,7 @@ export default function ConsultFormatScreen() {
 
   return (
     <ScreenChrome
-      eyebrow="Consultation"
-      title="How would you like to consult?"
-      subtitle={svcName ? `For your ${svcName} consultation.` : ''}
+      title="How would you like to meet?"
       footer={<PrimaryButton onClick={handleContinue} disabled={!pending}>Continue</PrimaryButton>}
     >
       <SelectCard
