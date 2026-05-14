@@ -47,6 +47,12 @@ export default function App() {
   const Screen = SCREENS[state.step] || BookingTypeScreen;
   const firstStepRender = useRef(true);
 
+  // True once the user has chosen a booking path. Going back to Step 1
+  // (via actions.back() or RESET) flips this back to false and the
+  // marketing sections reappear.
+  const bookingStarted =
+    state.step !== STEPS.BOOKING_TYPE || Boolean(state.bookingType);
+
   useEffect(() => {
     if (firstStepRender.current) {
       firstStepRender.current = false;
@@ -57,20 +63,28 @@ export default function App() {
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
     return () => window.cancelAnimationFrame(raf);
-  }, [state.step]);
+  }, [state.step, bookingStarted]);
 
   return (
     <div className="min-h-screen bg-bone text-ink-900">
       <SiteHeader />
-      <PageHero />
-      <AboutStrip />
+      {!bookingStarted && (
+        <>
+          <PageHero />
+          <AboutStrip />
+        </>
+      )}
       <main>
         <BookingSection>
           <Screen />
         </BookingSection>
       </main>
-      <TeamSection />
-      <ContactStrip />
+      {!bookingStarted && (
+        <>
+          <TeamSection />
+          <ContactStrip />
+        </>
+      )}
       <SiteFooter />
     </div>
   );
