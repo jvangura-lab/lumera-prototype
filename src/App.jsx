@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import SiteHeader from './site/SiteHeader.jsx';
 import SiteFooter from './site/SiteFooter.jsx';
 import PageHero from './site/PageHero.jsx';
@@ -45,6 +45,19 @@ const SCREENS = {
 export default function App() {
   const { state } = useBooking();
   const Screen = SCREENS[state.step] || BookingTypeScreen;
+  const firstStepRender = useRef(true);
+
+  useEffect(() => {
+    if (firstStepRender.current) {
+      firstStepRender.current = false;
+      return;
+    }
+    const raf = window.requestAnimationFrame(() => {
+      const el = document.getElementById('booking-step-heading');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    return () => window.cancelAnimationFrame(raf);
+  }, [state.step]);
 
   return (
     <div className="min-h-screen bg-bone text-ink-900">

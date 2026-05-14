@@ -27,7 +27,10 @@ export default function ScreenChrome({ title, subtitle, eyebrow, children, foote
         </div>
       )}
       {title && (
-        <h1 className="font-display text-4xl font-medium leading-tight tracking-tight text-ink-900 md:text-5xl">
+        <h1
+          id="booking-step-heading"
+          className="scroll-mt-[156px] font-display text-4xl font-medium leading-tight tracking-tight text-ink-900 md:text-5xl"
+        >
           {title}
         </h1>
       )}

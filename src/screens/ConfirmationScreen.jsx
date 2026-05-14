@@ -82,7 +82,11 @@ export default function ConfirmationScreen() {
         <div className="w-14 h-14 mx-auto rounded-full bg-gold-300/30 flex items-center justify-center mb-3">
           <CheckCircle2 className="w-7 h-7 text-gold-600" strokeWidth={2.5} />
         </div>
-        <h1 className="font-display text-3xl text-espresso-900 mb-1" style={{ fontWeight: 600 }}>
+        <h1
+          id="booking-step-heading"
+          className="scroll-mt-[100px] font-display text-3xl text-espresso-900 mb-1"
+          style={{ fontWeight: 600 }}
+        >
           You're booked!
         </h1>
         <p className="text-sm text-ink-500">
