@@ -1,5 +1,9 @@
 import React from 'react';
 
+const baseBtn =
+  'inline-flex items-center justify-center font-sans text-[13px] font-semibold uppercase tracking-eyebrow transition ' +
+  'rounded-sm focus:outline-none disabled:cursor-not-allowed';
+
 export function PrimaryButton({ children, onClick, disabled, type = 'button', loading = false, className = '' }) {
   return (
     <button
@@ -7,16 +11,16 @@ export function PrimaryButton({ children, onClick, disabled, type = 'button', lo
       onClick={onClick}
       disabled={disabled || loading}
       className={
-        'w-full rounded-xl px-5 py-3 font-semibold text-sm tracking-wide transition ' +
-        'bg-espresso-800 text-cream-100 hover:bg-espresso-700 active:scale-[0.99] ' +
-        'disabled:bg-cream-200 disabled:text-ink-400 disabled:cursor-not-allowed ' +
-        'shadow-soft ' +
+        baseBtn +
+        ' w-full px-6 py-4 ' +
+        'bg-ink-900 text-bone hover:bg-[#3a2e26] active:translate-y-[1px] ' +
+        'disabled:bg-[#E7DDCC] disabled:text-ink-500 ' +
         className
       }
     >
       {loading ? (
-        <span className="inline-flex items-center justify-center gap-2">
-          <span className="w-4 h-4 rounded-full border-2 border-cream-200/40 border-t-cream-100 animate-spin" />
+        <span className="inline-flex items-center gap-2">
+          <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-bone/30 border-t-bone" />
           Processing…
         </span>
       ) : (
@@ -32,7 +36,8 @@ export function GhostButton({ children, onClick, type = 'button', className = ''
       type={type}
       onClick={onClick}
       className={
-        'rounded-xl px-4 py-2 text-sm font-medium text-ink-700 hover:text-espresso-800 hover:bg-cream-100 transition ' +
+        baseBtn +
+        ' px-6 py-4 border border-ink-900 bg-transparent text-ink-900 hover:bg-ink-900 hover:text-bone ' +
         className
       }
     >
@@ -46,7 +51,7 @@ export function BackButton({ onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="text-xs font-medium text-ink-500 hover:text-espresso-800 transition flex items-center gap-1"
+      className="inline-flex items-center gap-2 font-sans text-[11px] uppercase tracking-eyebrow text-ink-500 transition-colors hover:text-ink-900"
     >
       <span aria-hidden>←</span> Back
     </button>

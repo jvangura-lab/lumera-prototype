@@ -4,44 +4,61 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Lumera palette — warm spa-luxe (champagne gold accent)
+        bone:            '#FBF8F2',
+        'taupe-cream':   '#E7DDCC',
+        'accent-soft':   '#EBDCBF',
+        accent:          '#B89968',
+        'accent-strong': '#8E7244',
+
+        // Backward-compatible scales (legacy class names used by funnel screens).
+        // Values remapped to the new Lumera palette; full rename happens in Phase 4.
         cream: {
-          50: '#FBF7F1',
-          100: '#F7F1E7',
-          200: '#EFE5D2',
-          300: '#E4D6BC',
+          50:  '#FBF8F2',  // bone (background)
+          100: '#F3ECE0',  // cream (surface)
+          200: '#E7DDCC',  // taupe-cream (surface-strong)
+          300: '#E2D6C3',  // border
         },
         blush: {
-          100: '#F4E2DC',
-          200: '#E9C8BD',
-          300: '#D9A99A',
-          400: '#C58874',
-          500: '#A66954',
+          100: '#F3ECE0',
+          200: '#E7DDCC',
+          300: '#B8AC9D',
+          400: '#847466',
+          500: '#4A3D33',
         },
         gold: {
-          300: '#D9B36C',
-          400: '#C39A4F',
-          500: '#A8823A',
-          600: '#8A6A2E',
+          300: '#EBDCBF',  // accent-soft
+          400: '#B89968',  // accent
+          500: '#B89968',  // accent
+          600: '#8E7244',  // accent-strong
         },
         espresso: {
-          700: '#3E2A22',
-          800: '#2E1F18',
-          900: '#1F1410',
+          700: '#4A3D33',  // ink-700
+          800: '#2A201A',  // ink-900
+          900: '#2A201A',  // ink-900
         },
         ink: {
-          900: '#2A1F1A',
-          700: '#4F3E36',
-          500: '#7B6B62',
-          400: '#9C8C82',
+          900: '#2A201A',
+          700: '#4A3D33',
+          500: '#847466',
+          400: '#B8AC9D',
+          300: '#B8AC9D',
         },
       },
       fontFamily: {
-        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+        display: ['"Playfair Display"', 'Georgia', 'serif'],
         sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
-        card: '0 12px 40px -16px rgba(62, 42, 34, 0.25)',
-        soft: '0 2px 12px -4px rgba(62, 42, 34, 0.12)',
+        soft: '0 2px 12px -4px rgba(42, 32, 26, 0.10)',
+        card: '0 12px 40px -16px rgba(42, 32, 26, 0.22)',
+      },
+      maxWidth: {
+        site: '1200px',
+        prose: '720px',
+      },
+      letterSpacing: {
+        eyebrow: '0.18em',
       },
     },
   },

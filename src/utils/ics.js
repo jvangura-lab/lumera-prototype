@@ -75,7 +75,7 @@ export function buildIcs(events) {
   return [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Magnolia Prototype//RIVR//EN',
+    'PRODID:-//Lumera Aesthetics//Booking//EN',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     VTIMEZONE_ET,

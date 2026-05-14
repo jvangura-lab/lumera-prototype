@@ -11,17 +11,17 @@ function hash(str) {
   return (h >>> 0);
 }
 
-const SESSION_SEED_KEY = '__magnolia_session_seed__';
+const SESSION_SEED_KEY = '__lumera_session_seed__';
 function getSessionSeed() {
   if (typeof window === 'undefined') return 0;
   if (!window[SESSION_SEED_KEY]) {
     try {
-      const stored = sessionStorage.getItem('magnolia.seed');
+      const stored = sessionStorage.getItem('lumera.seed');
       if (stored) {
         window[SESSION_SEED_KEY] = parseInt(stored, 10) || 1;
       } else {
         const s = Math.floor(Math.random() * 1e9) + 1;
-        sessionStorage.setItem('magnolia.seed', String(s));
+        sessionStorage.setItem('lumera.seed', String(s));
         window[SESSION_SEED_KEY] = s;
       }
     } catch {

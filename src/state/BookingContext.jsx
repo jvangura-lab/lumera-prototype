@@ -32,7 +32,7 @@ export function BookingProvider({ children }) {
   // Browser back-button interception
   useEffect(() => {
     if (state.step === STEPS.BOOKING_TYPE || state.step === STEPS.CONFIRMATION) return;
-    window.history.pushState({ magnolia: true, step: state.step }, '');
+    window.history.pushState({ lumera: true, step: state.step }, '');
     const onPop = () => {
       if (state.history.length > 0) {
         dispatch({ type: 'BACK' });
@@ -74,8 +74,8 @@ function buildActions(state, dispatch) {
     setPayment: (p) => dispatch({ type: 'SET_PAYMENT', value: p }),
     resetAll: () => {
       clearState();
-      try { sessionStorage.removeItem('magnolia.seed'); } catch {}
-      try { delete window.__magnolia_session_seed__; } catch {}
+      try { sessionStorage.removeItem('lumera.seed'); } catch {}
+      try { delete window.__lumera_session_seed__; } catch {}
       dispatch({ type: 'RESET' });
     },
   };

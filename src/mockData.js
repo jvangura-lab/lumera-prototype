@@ -184,9 +184,9 @@ export function practitionersForService(serviceId) {
 export const HEAR_ABOUT_OPTIONS = ['Google', 'Instagram', 'Friend/Family', 'Yelp', 'Other'];
 
 export const PLACEHOLDERS = {
-  spaName: '[Med Spa Name]',
-  spaPhone: '[Spa Phone Number]',
-  spaAddress: '[Med Spa Address]',
+  spaName: 'Lumera Aesthetics',
+  spaPhone: '(813) 555-0142',
+  spaAddress: '2401 W Kennedy Blvd, Suite 200, Tampa, FL 33609',
 };
 
 export const FEES = {
