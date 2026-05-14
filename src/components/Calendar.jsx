@@ -154,7 +154,7 @@ export default function Calendar({
           {slotsForDay.length === 0 ? (
             <div className="text-sm text-ink-500">No times available — pick another day.</div>
           ) : (
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {slotsForDay.map(({ slot, practitionerId }) => {
                 const isSel = selectedSlot === slot && isSameDay(day, selectedDate || day) && (!firstAvailableMode || selectedSlotPractitioner === practitionerId);
                 const p = findPractitionerById(practitionerId);
@@ -164,7 +164,7 @@ export default function Calendar({
                     type="button"
                     onClick={() => onPick({ date: day, slot, practitionerId })}
                     className={
-                      'rounded-lg px-3 py-2 text-xs num border transition flex flex-col items-start gap-0.5 ' +
+                      'rounded-lg px-3 py-2 text-xs num border transition flex flex-col items-start justify-center gap-0.5 min-h-[44px] md:min-h-[40px] ' +
                       (isSel
                         ? 'bg-espresso-800 text-cream-100 border-espresso-800'
                         : 'bg-white border-cream-200 text-ink-700 hover:border-gold-400 hover:bg-cream-50')
