@@ -3,7 +3,7 @@ import { BRAND } from './brand.js';
 
 export default function PageHero() {
   return (
-    <section className="relative overflow-hidden border-b border-[#E2D6C3] bg-gradient-to-b from-bone to-[#F3ECE0]">
+    <section id="hero" className="relative overflow-hidden border-b border-[#E2D6C3] bg-gradient-to-b from-bone to-[#F3ECE0]">
       <div className="absolute inset-0 pointer-events-none">
         <div
           className="absolute inset-y-0 right-0 w-1/2 opacity-[0.18] bg-cover bg-center"

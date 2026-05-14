@@ -5,6 +5,7 @@ import PageHero from './site/PageHero.jsx';
 import AboutStrip from './site/AboutStrip.jsx';
 import TeamSection from './site/TeamSection.jsx';
 import ContactStrip from './site/ContactStrip.jsx';
+import MobileBookCTA from './site/MobileBookCTA.jsx';
 import BookingSection from './components/BookingSection.jsx';
 import { useBooking, STEPS } from './state/BookingContext.jsx';
 
@@ -86,6 +87,7 @@ export default function App() {
         </>
       )}
       <SiteFooter />
+      <MobileBookCTA hidden={bookingStarted} />
     </div>
   );
 }
