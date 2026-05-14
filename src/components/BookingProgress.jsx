@@ -1,13 +1,25 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Check } from 'lucide-react';
 import { useBooking, deriveFlow, stepLabel, STEPS } from '../state/BookingContext.jsx';
 
 export default function BookingProgress() {
   const { state } = useBooking();
+  const activeChipRef = useRef(null);
+
+  useEffect(() => {
+    const el = activeChipRef.current;
+    if (!el) return;
+    const raf = window.requestAnimationFrame(() => {
+      el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    });
+    return () => window.cancelAnimationFrame(raf);
+  }, [state.step]);
+
+  if (state.step === STEPS.CONFIRMATION) return null;
+  if (state.step === STEPS.BOOKING_TYPE) return null;
+
   const { path } = deriveFlow(state);
   const visiblePath = path.filter((s) => s !== STEPS.CONFIRMATION);
-  if (state.step === STEPS.CONFIRMATION) return null;
-
   const currentIdx = Math.max(visiblePath.indexOf(state.step), 0);
   const total = visiblePath.length;
 
@@ -17,6 +29,7 @@ export default function BookingProgress() {
       aria-valuemin={1}
       aria-valuemax={total}
       aria-valuenow={currentIdx + 1}
+      aria-valuetext={`Step ${currentIdx + 1} of ${total}: ${stepLabel(state.step)}`}
       aria-label={`Step ${currentIdx + 1} of ${total}: ${stepLabel(state.step)}`}
       className="sticky top-[72px] z-30 border-b border-[#E2D6C3] bg-white/95 backdrop-blur"
     >
@@ -30,7 +43,10 @@ export default function BookingProgress() {
             const active = i === currentIdx;
             return (
               <React.Fragment key={step}>
-                <div className="flex shrink-0 items-center gap-2">
+                <div
+                  ref={active ? activeChipRef : undefined}
+                  className="flex shrink-0 items-center gap-2"
+                >
                   <span
                     className={
                       'flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold transition ' +
