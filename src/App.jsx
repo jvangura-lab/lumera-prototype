@@ -1,7 +1,11 @@
 import React from 'react';
-import Banner from './components/Banner.jsx';
-import Footer from './components/Footer.jsx';
-import ProgressBar from './components/ProgressBar.jsx';
+import SiteHeader from './site/SiteHeader.jsx';
+import SiteFooter from './site/SiteFooter.jsx';
+import PageHero from './site/PageHero.jsx';
+import AboutStrip from './site/AboutStrip.jsx';
+import TeamSection from './site/TeamSection.jsx';
+import ContactStrip from './site/ContactStrip.jsx';
+import BookingSection from './components/BookingSection.jsx';
 import { useBooking, STEPS } from './state/BookingContext.jsx';
 
 import BookingTypeScreen from './screens/BookingTypeScreen.jsx';
@@ -43,17 +47,18 @@ export default function App() {
   const Screen = SCREENS[state.step] || BookingTypeScreen;
 
   return (
-    <div className="min-h-screen w-full flex items-start justify-center bg-transparent">
-      <div className="w-full max-w-[420px] mt-3 mb-6">
-        <div className="bg-white rounded-2xl shadow-card overflow-hidden">
-          <Banner />
-          <ProgressBar />
-          <main>
-            <Screen />
-          </main>
-          <Footer />
-        </div>
-      </div>
+    <div className="min-h-screen bg-bone text-ink-900">
+      <SiteHeader />
+      <PageHero />
+      <AboutStrip />
+      <main>
+        <BookingSection>
+          <Screen />
+        </BookingSection>
+      </main>
+      <TeamSection />
+      <ContactStrip />
+      <SiteFooter />
     </div>
   );
 }

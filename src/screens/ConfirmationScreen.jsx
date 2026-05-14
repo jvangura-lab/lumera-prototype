@@ -38,14 +38,14 @@ export default function ConfirmationScreen() {
       : `${service?.name || 'Appointment'}`;
     const ics = buildIcs([
       {
-        uid: `magnolia-${apt.dateIso}-${apt.slot}@magnolia.local`,
+        uid: `lumera-${apt.dateIso}-${apt.slot}@lumera-aesthetics.com`,
         start, end,
         summary,
         description: `Practitioner: ${practitioner?.name}\nFormat: ${state.consultFormat || 'In-Person'}\nLocation: ${PLACEHOLDERS.spaName}`,
         location: PLACEHOLDERS.spaAddress,
       }
     ]);
-    downloadIcs('magnolia-appointment.ics', ics);
+    downloadIcs('lumera-appointment.ics', ics);
   };
 
   const downloadSeriesIcs = () => {
@@ -54,7 +54,7 @@ export default function ConfirmationScreen() {
       const start = appointmentDateTime(s.dateIso, s.slot);
       const end = endDateTime(start, series?.duration || 30);
       return {
-        uid: `magnolia-series-${state.seriesId}-${i}@magnolia.local`,
+        uid: `lumera-series-${state.seriesId}-${i}@lumera-aesthetics.com`,
         start, end,
         summary: `${series.name} — Session ${i + 1} of ${series.sessions}`,
         description: `Practitioner: ${practitioner?.name}\nLocation: ${PLACEHOLDERS.spaName}`,
@@ -64,7 +64,7 @@ export default function ConfirmationScreen() {
     if (apt && isConsult) {
       const start = appointmentDateTime(apt.dateIso, apt.slot);
       events.unshift({
-        uid: `magnolia-series-consult-${state.seriesId}@magnolia.local`,
+        uid: `lumera-series-consult-${state.seriesId}@lumera-aesthetics.com`,
         start,
         end: endDateTime(start, 30),
         summary: `Consultation — ${series.name}`,
@@ -73,7 +73,7 @@ export default function ConfirmationScreen() {
       });
     }
     const ics = buildIcs(events);
-    downloadIcs('magnolia-series.ics', ics);
+    downloadIcs('lumera-series.ics', ics);
   };
 
   return (
@@ -279,8 +279,8 @@ function SpaEmail({ state }) {
   const series = state.seriesId ? findSeriesById(state.seriesId) : null;
   return (
     <EmailPreview
-      from="notifications@rivr.app (RIVR Bookings)"
-      to={`${PLACEHOLDERS.spaName} <bookings@medspa.com>`}
+      from={`bookings@lumera-aesthetics.com (${PLACEHOLDERS.spaName} Front Desk)`}
+      to={`${PLACEHOLDERS.spaName} <front-desk@lumera-aesthetics.com>`}
       subject={isSeries ? `New series booking — ${series.name}` : `New booking — ${state.intake.fullName}`}
     >
       <p><strong>New booking received.</strong></p>

@@ -9,37 +9,45 @@ export default function SelectCard({ selected, onClick, disabled, title, subtitl
       disabled={disabled}
       aria-pressed={selected}
       className={
-        'group w-full text-left rounded-xl border px-4 py-3 transition relative ' +
+        'group relative w-full rounded-sm border text-left transition px-5 py-5 md:px-6 md:py-6 ' +
         (disabled
-          ? 'border-cream-200 bg-cream-50 text-ink-400 cursor-not-allowed '
+          ? 'cursor-not-allowed border-[#E7DDCC] bg-[#F3ECE0]/50 text-ink-500 '
           : selected
-            ? 'border-gold-400 bg-blush-100/60 shadow-soft '
-            : 'border-cream-200 bg-white hover:border-blush-300 hover:bg-cream-50 ')
+            ? 'border-ink-900 bg-white shadow-soft '
+            : 'border-[#E2D6C3] bg-white hover:border-ink-700 ')
       }
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-4">
         <span
           className={
-            'mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition ' +
-            (selected ? 'border-gold-500 bg-gold-400 text-espresso-900' : 'border-cream-300 bg-white')
+            'mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition ' +
+            (selected
+              ? 'border-accent-strong bg-accent-strong text-bone'
+              : 'border-ink-300 bg-white')
           }
           aria-hidden
         >
-          {selected && <Check className="w-3 h-3" strokeWidth={3} />}
+          {selected && <Check className="h-3 w-3" strokeWidth={3.5} />}
         </span>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between gap-2">
-            <div className="font-display text-lg leading-tight" style={{ fontWeight: 600 }}>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-3">
+            <div className="font-display text-xl font-medium leading-tight text-ink-900 md:text-2xl">
               {title}
             </div>
             {badge && (
-              <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-gold-300/30 text-gold-600 border border-gold-300/50 num">
+              <span className="num shrink-0 rounded-sm border border-accent/40 bg-accent-soft/60 px-2 py-0.5 text-[10px] uppercase tracking-eyebrow text-accent-strong">
                 {badge}
               </span>
             )}
           </div>
-          {subtitle && <div className="text-sm text-ink-500 mt-0.5 leading-snug">{subtitle}</div>}
-          {meta && <div className="text-[11px] text-ink-400 mt-1 num">{meta}</div>}
+          {subtitle && (
+            <div className="mt-1.5 font-sans text-sm leading-relaxed text-ink-500 md:text-[15px]">
+              {subtitle}
+            </div>
+          )}
+          {meta && (
+            <div className="num mt-2 font-sans text-xs text-ink-500">{meta}</div>
+          )}
           {children}
         </div>
       </div>
