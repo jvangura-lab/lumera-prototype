@@ -14,7 +14,8 @@ export function PrimaryButton({ children, onClick, disabled, type = 'button', lo
         baseBtn +
         ' w-full px-6 py-4 ' +
         'bg-ink-900 text-bone hover:bg-[#3a2e26] active:translate-y-[1px] ' +
-        'disabled:bg-[#E7DDCC] disabled:text-ink-500 ' +
+        'disabled:bg-[#E7DDCC] disabled:text-ink-500/60 disabled:opacity-70 ' +
+        'disabled:hover:bg-[#E7DDCC] ' +
         className
       }
     >

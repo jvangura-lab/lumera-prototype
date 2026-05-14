@@ -116,19 +116,25 @@ export default function Calendar({
               disabled={disabled}
               onClick={() => setDay(d)}
               className={
-                'aspect-square rounded-lg text-sm num transition flex items-center justify-center ' +
+                'relative aspect-square rounded-lg text-sm num transition flex items-center justify-center ' +
                 (isSel
-                  ? 'bg-espresso-800 text-cream-100 shadow-soft'
+                  ? 'bg-espresso-800 text-cream-100 font-semibold shadow-soft'
                   : disabled
-                    ? 'text-ink-400/50 cursor-not-allowed'
+                    ? 'text-ink-400/40 cursor-not-allowed'
                     : isToday
-                      ? 'bg-gold-300/30 text-espresso-800 hover:bg-gold-300/50'
-                      : 'text-ink-700 hover:bg-cream-100')
+                      ? 'bg-gold-300/30 text-ink-900 font-semibold ring-1 ring-gold-400 hover:bg-gold-300/50'
+                      : 'text-ink-900 font-medium hover:bg-cream-200/70')
               }
               aria-pressed={isSel || undefined}
               aria-label={format(d, 'EEEE, MMMM d')}
             >
               {d.getDate()}
+              {!isSel && !disabled && !isToday && (
+                <span
+                  aria-hidden
+                  className="absolute bottom-1 left-1/2 h-[3px] w-[3px] -translate-x-1/2 rounded-full bg-accent"
+                />
+              )}
             </button>
           );
         })}
