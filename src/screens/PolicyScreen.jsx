@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useId, useState } from 'react';
 import ScreenChrome from '../components/ScreenChrome.jsx';
 import { PrimaryButton } from '../components/Button.jsx';
 import { useBooking, STEPS, BOOKING_TYPES, isSeriesScheduled } from '../state/BookingContext.jsx';
@@ -8,6 +8,7 @@ import { formatPrice } from '../utils/formatting.js';
 export default function PolicyScreen() {
   const { state, actions } = useBooking();
   const [ack, setAck] = useState(state.policyAck || false);
+  const policyAckId = useId();
   const isSeries = isSeriesScheduled(state);
   const sameDay = state.sameDay === true;
   const cardOnFile = !sameDay; // sameDay path covers payment via the deposit policy
@@ -69,13 +70,17 @@ export default function PolicyScreen() {
 
       <div className="pt-3 mt-2 border-t border-cream-200 space-y-2">
         <label
+          htmlFor={policyAckId}
           className={
             'flex items-start gap-2.5 rounded-lg border p-3 text-sm cursor-pointer transition ' +
             (ack ? 'border-gold-400 bg-blush-100/60' : 'border-cream-200 bg-white')
           }
         >
           <input
+            id={policyAckId}
+            name="policyAck"
             type="checkbox"
+            required
             className="mt-0.5"
             checked={ack}
             onChange={(e) => setAck(e.target.checked)}
