@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import SiteHeader from './site/SiteHeader.jsx';
 import SiteFooter from './site/SiteFooter.jsx';
 import PageHero from './site/PageHero.jsx';
@@ -47,6 +47,7 @@ export default function App() {
   const { state } = useBooking();
   const Screen = SCREENS[state.step] || BookingTypeScreen;
   const firstStepRender = useRef(true);
+  const prevBookingStarted = useRef(false);
 
   // True once the user has chosen a booking path. Going back to Step 1
   // (via actions.back() or RESET) flips this back to false and the
@@ -54,16 +55,28 @@ export default function App() {
   const bookingStarted =
     state.step !== STEPS.BOOKING_TYPE || Boolean(state.bookingType);
 
-  useEffect(() => {
+  // useLayoutEffect so DOM mutation and scroll reposition land in the
+  // same paint frame — otherwise the marketing-section unmount
+  // visually races the scrollIntoView and reads as a snap.
+  useLayoutEffect(() => {
     if (firstStepRender.current) {
       firstStepRender.current = false;
+      prevBookingStarted.current = bookingStarted;
       return;
     }
-    const raf = window.requestAnimationFrame(() => {
-      const el = document.getElementById('booking-step-heading');
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-    return () => window.cancelAnimationFrame(raf);
+    const el = document.getElementById('booking-step-heading');
+    if (el) {
+      const justStartedBooking =
+        bookingStarted && !prevBookingStarted.current;
+      // On the bookingStarted flip, ~3000px of layout disappears
+      // around the user; a smooth animation on top of that reads as
+      // jitter. Snap instantly, then resume smooth for in-flow steps.
+      el.scrollIntoView({
+        behavior: justStartedBooking ? 'auto' : 'smooth',
+        block: 'start',
+      });
+    }
+    prevBookingStarted.current = bookingStarted;
   }, [state.step, bookingStarted]);
 
   return (
