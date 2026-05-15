@@ -1,32 +1,28 @@
 import React from 'react';
 
-// LUMERA-NOTE: These are stock Unsplash portraits used as visual
-// placeholders for before/after composition. Replace with real
-// patient photos (with signed written-consent forms on file)
-// before production launch. When real photos return, re-add the
-// "All featured patients have provided written consent." line to
-// the disclaimer below.
+// LUMERA-NOTE: Production launch requires real consented patient
+// photos (signed HIPAA release on file). When real photos return,
+// re-add this third sentence to the disclaimer below:
+//   "All featured patients have provided written consent."
+//
+// Drop your composite before/after images at the paths below — each
+// image should be a single horizontal composite with "before" on
+// the left and "after" on the right (the format the user supplied).
 const PAIRS = [
   {
-    treatment: 'Botox · 2 weeks post-treatment',
-    before:
-      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&h=720&q=80',
-    after:
-      'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&h=720&q=80',
+    treatment: 'Dermal filler · Marionette lines',
+    src: '/before-after/pair-1.jpg',
+    alt: 'Before and after photo: dermal filler treatment around the mouth and chin',
   },
   {
-    treatment: 'HydraFacial · 1 week post-treatment',
-    before:
-      'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=600&h=720&q=80',
-    after:
-      'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=600&h=720&q=80',
+    treatment: 'HydraFacial · Texture & clarity',
+    src: '/before-after/pair-2.jpg',
+    alt: 'Before and after photo: skin clarity around the eye area',
   },
   {
-    treatment: 'Microneedling · 6 weeks post-treatment',
-    before:
-      'https://images.unsplash.com/photo-1542596594-649edbc13630?auto=format&fit=crop&w=600&h=720&q=80',
-    after:
-      'https://images.unsplash.com/photo-1546961342-1633ee6cccf3?auto=format&fit=crop&w=600&h=720&q=80',
+    treatment: 'Acne protocol · 8 weeks',
+    src: '/before-after/pair-3.jpg',
+    alt: 'Before and after photo: acne clearing on the cheek',
   },
 ];
 
@@ -49,10 +45,26 @@ export default function BeforeAfterSection() {
 
         <div className="mt-12 grid gap-10 md:grid-cols-3">
           {PAIRS.map((pair) => (
-            <figure key={pair.treatment} className="flex flex-col">
-              <div className="grid grid-cols-2 gap-1.5 overflow-hidden rounded-sm">
-                <PhotoCard label="Before" src={pair.before} />
-                <PhotoCard label="After"  src={pair.after} />
+            <figure key={pair.src} className="flex flex-col">
+              <div className="group relative overflow-hidden rounded-sm bg-[#F3ECE0]">
+                <img
+                  src={pair.src}
+                  alt={pair.alt}
+                  className="block h-auto w-full transition-transform duration-500 group-hover:scale-[1.02]"
+                  loading="lazy"
+                />
+                {/* Before / After labels overlaid on the two halves */}
+                <span className="pointer-events-none absolute left-2 top-2 rounded-sm bg-ink-900/80 px-2 py-0.5 font-sans text-[10px] uppercase tracking-eyebrow text-bone">
+                  Before
+                </span>
+                <span className="pointer-events-none absolute right-2 top-2 rounded-sm bg-ink-900/80 px-2 py-0.5 font-sans text-[10px] uppercase tracking-eyebrow text-bone">
+                  After
+                </span>
+                {/* Center divider hint */}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-y-0 left-1/2 w-px bg-bone/40"
+                />
               </div>
               <figcaption className="mt-4 font-sans text-[12px] uppercase tracking-eyebrow text-accent-strong">
                 {pair.treatment}
@@ -66,21 +78,5 @@ export default function BeforeAfterSection() {
         </p>
       </div>
     </section>
-  );
-}
-
-function PhotoCard({ label, src }) {
-  return (
-    <div className="group relative aspect-[5/6] overflow-hidden bg-[#F3ECE0]">
-      <img
-        src={src}
-        alt={`${label} treatment`}
-        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-        loading="lazy"
-      />
-      <div className="absolute left-2 top-2 rounded-sm bg-ink-900/80 px-2 py-0.5 font-sans text-[10px] uppercase tracking-eyebrow text-bone">
-        {label}
-      </div>
-    </div>
   );
 }
