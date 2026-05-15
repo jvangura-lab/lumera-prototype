@@ -87,10 +87,10 @@ export default function ConfirmationScreen() {
           className="scroll-mt-[100px] font-display text-3xl text-espresso-900 mb-1"
           style={{ fontWeight: 600 }}
         >
-          You're booked!
+          You're booked.
         </h1>
         <p className="text-sm text-ink-500">
-          A confirmation has been sent to <span className="text-ink-900">{state.intake.email}</span>.
+          Confirmation's on its way to <span className="text-ink-900">{state.intake.email}</span>. We'll see you then.
         </p>
       </div>
 
@@ -250,7 +250,7 @@ function PatientEmail({ state }) {
             <p>Format: {state.consultFormat === 'virtual' ? 'Virtual' : 'In-Person'}</p>
           )}
           {state.sameDay && (
-            <p>You've reserved a same-day procedure slot. Your $150 deposit is held.</p>
+            <p>Same-day procedure slot reserved. Your {formatPrice(FEES.sameDayDeposit)} deposit is held.</p>
           )}
           {isSeriesRoutedToConsult && series && (
             <p>After your visit, you can schedule your <strong>{series.name}</strong> series ({series.sessions} sessions).</p>
@@ -265,8 +265,8 @@ function PatientEmail({ state }) {
             : `Card on file: ${state.payment.brand} •••• ${state.payment.last4}`}
         </p>
       )}
-      <p>To cancel or reschedule, please call {PLACEHOLDERS.spaPhone}.</p>
-      <p>— {PLACEHOLDERS.spaName}</p>
+      <p>Need to cancel or move it? Call {PLACEHOLDERS.spaPhone}.</p>
+      <p>— The team at {PLACEHOLDERS.spaName}</p>
     </EmailPreview>
   );
 }

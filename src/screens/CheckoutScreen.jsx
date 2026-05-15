@@ -18,11 +18,13 @@ export default function CheckoutScreen() {
     const e = {};
     if (!card.name.trim()) e.name = 'Required';
     const digits = card.number.replace(/\D/g, '');
-    if (digits.length < 13 || digits.length > 19) e.number = 'Invalid card';
+    if (digits.length < 13 || digits.length > 19) e.number = 'Check the card number.';
     const exp = card.exp.replace(/\D/g, '');
-    if (exp.length !== 4) e.exp = 'MM/YY';
-    if (card.cvc.length < 3 || card.cvc.length > 4) e.cvc = '3-4 digits';
-    if (card.zip.replace(/\D/g, '').length !== 5) e.zip = '5-digit ZIP';
+    // Error string must be visually distinct from the "MM/YY" placeholder
+    // or the user can't tell the field is in an error state.
+    if (exp.length !== 4) e.exp = 'Check the expiry date.';
+    if (card.cvc.length < 3 || card.cvc.length > 4) e.cvc = 'CVC is 3 or 4 digits.';
+    if (card.zip.replace(/\D/g, '').length !== 5) e.zip = 'ZIP should be 5 digits.';
     return e;
   };
 
@@ -141,7 +143,7 @@ function deriveScenario(state) {
       kind: 'series',
       amountToday: 0,
       heading: 'Save card and book.',
-      buttonLabel: 'Save Card and Book Series',
+      buttonLabel: 'Save card and book series',
     };
   }
   if (isConsultFlow(state)) {
@@ -151,21 +153,21 @@ function deriveScenario(state) {
         kind: 'consult+sameday',
         amountToday: total,
         heading: `Pay ${formatPrice(total)} and book.`,
-        buttonLabel: `Pay ${formatPrice(total)} and Book`,
+        buttonLabel: `Pay ${formatPrice(total)} and book`,
       };
     }
     return {
       kind: 'consult',
       amountToday: FEES.consultation,
       heading: `Pay ${formatPrice(FEES.consultation)} and book.`,
-      buttonLabel: `Pay ${formatPrice(FEES.consultation)} and Book`,
+      buttonLabel: `Pay ${formatPrice(FEES.consultation)} and book`,
     };
   }
   return {
     kind: 'direct',
     amountToday: 0,
     heading: 'Save card and book.',
-    buttonLabel: 'Save Card and Book',
+    buttonLabel: 'Save card and book',
   };
 }
 
@@ -178,22 +180,22 @@ function OrderSummary({ state, scenario }) {
     const pkg = findSeriesById(state.seriesId);
     lines.push({ label: pkg.name, value: formatPrice(pkg.totalPrice) });
     lines.push({ label: `${pkg.sessions} sessions · ${formatPrice(pkg.perSessionPrice)}/session`, sub: true });
-    belowNote = 'Your card will be securely held on file. The med spa will bill for the series per their package terms.';
+    belowNote = 'Your card stays on file. We bill for the series per the package terms.';
   } else if (scenario.kind === 'consult') {
     lines.push({ label: 'Consultation fee', value: formatPrice(FEES.consultation) });
-    belowNote = 'Card will also be saved on file for any post-visit charges from your appointment.';
+    belowNote = 'Your card also stays on file for any post-visit charges from your appointment.';
   } else if (scenario.kind === 'consult+sameday') {
     lines.push({ label: 'Consultation fee', value: formatPrice(FEES.consultation) });
     lines.push({ label: 'Same-day procedure deposit', value: formatPrice(FEES.sameDayDeposit) });
-    belowNote = 'Card will also be saved on file for any post-visit charges.';
+    belowNote = 'Your card also stays on file for any post-visit charges.';
   } else {
     // direct service booking
     const svc = state.serviceId ? findServiceById(state.serviceId) : null;
     if (svc) {
       lines.push({ label: svc.name, value: formatPrice(svc.price) });
-      belowNote = `Your card will be securely held on file. The med spa will charge ${formatPrice(svc.price)} after your visit.`;
+      belowNote = `Your card stays on file. We charge ${formatPrice(svc.price)} after your visit.`;
     } else {
-      belowNote = 'Your card will be securely held on file. The med spa will charge after your visit.';
+      belowNote = 'Your card stays on file. We charge after your visit.';
     }
   }
 
