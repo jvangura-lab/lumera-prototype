@@ -5,6 +5,9 @@ import PageHero from './site/PageHero.jsx';
 import AboutStrip from './site/AboutStrip.jsx';
 import TeamSection from './site/TeamSection.jsx';
 import TrustStrip from './site/TrustStrip.jsx';
+import FaqSection from './site/FaqSection.jsx';
+import TestimonialsSection from './site/TestimonialsSection.jsx';
+import BeforeAfterSection from './site/BeforeAfterSection.jsx';
 import ContactStrip from './site/ContactStrip.jsx';
 import MobileBookCTA from './site/MobileBookCTA.jsx';
 import BookingSection from './components/BookingSection.jsx';
@@ -114,6 +117,9 @@ export default function App() {
         <>
           <TrustStrip />
           <TeamSection />
+          <TestimonialsSection />
+          <BeforeAfterSection />
+          <FaqSection />
           <ContactStrip />
         </>
       )}
