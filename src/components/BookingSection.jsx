@@ -1,5 +1,6 @@
 import React from 'react';
 import BookingProgress from './BookingProgress.jsx';
+import BookingSummaryBand from './BookingSummaryBand.jsx';
 import { BOOKING_ANCHOR_ID } from '../site/brand.js';
 import { useBooking, STEPS } from '../state/BookingContext.jsx';
 
@@ -9,6 +10,7 @@ export default function BookingSection({ children }) {
   return (
     <>
       {!isConfirmation && <BookingProgress />}
+      {!isConfirmation && <BookingSummaryBand />}
       <section
         id={BOOKING_ANCHOR_ID}
         className="bg-bone scroll-mt-[140px]"
