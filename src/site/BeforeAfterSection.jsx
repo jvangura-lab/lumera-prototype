@@ -1,3 +1,6 @@
+// LUMERA-NOTE: moved off booking page. To be relocated to a dedicated
+// /gallery route in a future pass. Kept in the repo so the component
+// can be reused without re-implementing it.
 import React from 'react';
 
 // LUMERA-NOTE: Production launch requires real consented patient
