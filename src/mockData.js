@@ -168,7 +168,7 @@ export const PRACTITIONERS = [
     initials: 'TB',
     accent: 'blush',
     specialties: ['Botox', 'Filler', 'IV Therapy', 'B12'],
-    bio: "Aesthetics and wellness. Taylor specializes in subtle enhancements paired with IV protocols for sustained results.",
+    bio: "Aesthetics and wellness. Taylor pairs subtle enhancements with IV protocols — small adjustments that build over weeks, not big swings.",
     services: ['botox', 'filler', 'iv-therapy', 'b12'],
   },
 ];
