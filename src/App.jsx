@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import SiteHeader from './site/SiteHeader.jsx';
 import SiteFooter from './site/SiteFooter.jsx';
 import PageHero from './site/PageHero.jsx';
@@ -55,34 +55,50 @@ export default function App() {
   const bookingStarted =
     state.step !== STEPS.BOOKING_TYPE || Boolean(state.bookingType);
 
-  // useLayoutEffect so DOM mutation and scroll reposition land in the
-  // same paint frame — otherwise the marketing-section unmount
-  // visually races the scrollIntoView and reads as a snap.
-  useLayoutEffect(() => {
+  // Whether marketing sections are actually mounted. We delay the
+  // unmount until AFTER the smooth-scroll to the booking heading
+  // completes — otherwise the page height drops mid-scroll, scrollY
+  // gets clamped, and the user briefly sees the footer before the
+  // scroll re-targets the heading.
+  const [marketingHidden, setMarketingHidden] = useState(false);
+
+  useEffect(() => {
     if (firstStepRender.current) {
       firstStepRender.current = false;
       prevBookingStarted.current = bookingStarted;
+      setMarketingHidden(bookingStarted);
       return;
     }
-    const el = document.getElementById('booking-step-heading');
-    if (el) {
-      const justStartedBooking =
-        bookingStarted && !prevBookingStarted.current;
-      // On the bookingStarted flip, ~3000px of layout disappears
-      // around the user; a smooth animation on top of that reads as
-      // jitter. Snap instantly, then resume smooth for in-flow steps.
-      el.scrollIntoView({
-        behavior: justStartedBooking ? 'auto' : 'smooth',
-        block: 'start',
-      });
+
+    if (bookingStarted && !prevBookingStarted.current) {
+      // Path just picked. Marketing is still mounted — smooth-scroll
+      // the heading to the top of the viewport first. By the time
+      // the timeout fires and we unmount, the marketing is already
+      // off-screen above, so removing it is visually inert.
+      const el = document.getElementById('booking-step-heading');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const t = window.setTimeout(() => setMarketingHidden(true), 650);
+      prevBookingStarted.current = bookingStarted;
+      return () => window.clearTimeout(t);
     }
+
+    if (!bookingStarted) {
+      // Returned to Step 1 (or full reset). Re-mount marketing.
+      setMarketingHidden(false);
+      prevBookingStarted.current = bookingStarted;
+      return;
+    }
+
+    // Normal step-to-step transition inside the flow.
+    const el = document.getElementById('booking-step-heading');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     prevBookingStarted.current = bookingStarted;
   }, [state.step, bookingStarted]);
 
   return (
     <div className="min-h-screen bg-bone text-ink-900">
       <SiteHeader />
-      {!bookingStarted && (
+      {!marketingHidden && (
         <>
           <PageHero />
           <AboutStrip />
@@ -93,7 +109,7 @@ export default function App() {
           <Screen />
         </BookingSection>
       </main>
-      {!bookingStarted && (
+      {!marketingHidden && (
         <>
           <TeamSection />
           <ContactStrip />
