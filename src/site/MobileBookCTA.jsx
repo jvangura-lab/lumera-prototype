@@ -27,6 +27,18 @@ export default function MobileBookCTA({ hidden = false }) {
 
   const handleClick = (e) => {
     e.preventDefault();
+    // Match SiteHeader's Reserve-a-Visit behavior: scroll to the
+    // booking heading directly so the step content lands fully in
+    // view, not below the section's internal top padding.
+    const heading = document.getElementById('booking-step-heading');
+    if (heading) {
+      const stickyHeader = document.querySelector('header');
+      const stickyOffset = stickyHeader ? stickyHeader.offsetHeight : 72;
+      const breathingRoom = 16;
+      const y = window.scrollY + heading.getBoundingClientRect().top - stickyOffset - breathingRoom;
+      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+      return;
+    }
     const target = document.getElementById(BOOKING_ANCHOR_ID);
     if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
