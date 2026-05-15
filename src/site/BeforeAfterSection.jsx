@@ -11,17 +11,17 @@ import React from 'react';
 const PAIRS = [
   {
     treatment: 'Dermal filler · Marionette lines',
-    src: '/before-after/pair-1.jpg',
+    src: '/before-after/pair-1.png',
     alt: 'Before and after photo: dermal filler treatment around the mouth and chin',
   },
   {
     treatment: 'HydraFacial · Texture & clarity',
-    src: '/before-after/pair-2.jpg',
+    src: '/before-after/pair-2.png',
     alt: 'Before and after photo: skin clarity around the eye area',
   },
   {
     treatment: 'Acne protocol · 8 weeks',
-    src: '/before-after/pair-3.jpg',
+    src: '/before-after/pair-3.png',
     alt: 'Before and after photo: acne clearing on the cheek',
   },
 ];
