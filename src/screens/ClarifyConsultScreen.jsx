@@ -15,9 +15,7 @@ export default function ClarifyConsultScreen() {
     ? `${series?.name || 'This series'} series`
     : (service?.name || 'This service');
   const followOn = isSeries ? 'schedule the series' : 'schedule the procedure';
-  const explainer = isSeries
-    ? `${itemLabel} requires a consultation first. We'll book your consultation now; you can ${followOn} after we meet.`
-    : `${itemLabel} requires a consultation first. We'll book your consultation now; you can ${followOn} after we meet.`;
+  const explainer = `${itemLabel} requires a consultation first. We'll book that now — you can ${followOn} once you've met your practitioner.`;
 
   return (
     <ScreenChrome
@@ -29,7 +27,7 @@ export default function ClarifyConsultScreen() {
         <Info className="w-4 h-4 mt-0.5 text-gold-500 flex-shrink-0" />
         <div>
           A consultation lets your practitioner assess what's right for you before any treatment.
-          You'll only be charged the consultation fee today; nothing else is committed.
+          Only the consultation fee is charged today — nothing else.
         </div>
       </div>
     </ScreenChrome>

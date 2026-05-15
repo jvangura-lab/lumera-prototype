@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useId, useState } from 'react';
 import ScreenChrome from '../components/ScreenChrome.jsx';
 import { PrimaryButton } from '../components/Button.jsx';
 import { useBooking, STEPS, BOOKING_TYPES, isSeriesScheduled } from '../state/BookingContext.jsx';
@@ -8,6 +8,7 @@ import { formatPrice } from '../utils/formatting.js';
 export default function PolicyScreen() {
   const { state, actions } = useBooking();
   const [ack, setAck] = useState(state.policyAck || false);
+  const policyAckId = useId();
   const isSeries = isSeriesScheduled(state);
   const sameDay = state.sameDay === true;
   const cardOnFile = !sameDay; // sameDay path covers payment via the deposit policy
@@ -29,15 +30,15 @@ export default function PolicyScreen() {
     >
       <div className="divide-y divide-cream-200">
         <Section label="Cancellations & Reschedules">
-          All cancellations and reschedules must be handled by calling the spa directly at{' '}
-          <span className="font-medium">{PLACEHOLDERS.spaPhone}</span>. Cancellations cannot be
-          processed online. Please give at least 24 hours notice when possible.
+          Cancel or reschedule by calling{' '}
+          <span className="font-medium">{PLACEHOLDERS.spaPhone}</span> — these can't be processed
+          online. Please give 24 hours' notice when possible.
         </Section>
 
         <Section label="Privacy & Data">
-          Your information is handled in accordance with HIPAA standards and used only for your
-          appointment, communication from the spa, and payment processing. We do not share your
-          data with third parties.
+          Your information is handled per HIPAA standards and used only for your appointment,
+          communication from the spa, and payment processing. We don't share your data with
+          third parties.
         </Section>
 
         {sameDay && (
@@ -52,30 +53,33 @@ export default function PolicyScreen() {
 
         {cardOnFile && (
           <Section label="Payment">
-            Your card will be securely held on file. The med spa will charge for services after
-            your visit per their pricing. Charges may include the booked service plus any add-on
-            treatments performed during your visit.
+            Your card stays on file. We charge for services after your visit per our pricing —
+            including any add-on treatments performed during your visit.
           </Section>
         )}
 
         {isSeries && (
           <Section label="Session Series">
-            Each individual session in your series must be rescheduled by calling the spa directly.
-            Series are billed per the spa's package terms — your card on file will be charged
-            accordingly. Missed sessions follow the spa's individual cancellation policy.
+            Reschedule individual sessions by calling the spa directly. Series are billed per the
+            package terms — your card on file will be charged accordingly. Missed sessions follow
+            the same cancellation policy as single visits.
           </Section>
         )}
       </div>
 
       <div className="pt-3 mt-2 border-t border-cream-200 space-y-2">
         <label
+          htmlFor={policyAckId}
           className={
             'flex items-start gap-2.5 rounded-lg border p-3 text-sm cursor-pointer transition ' +
             (ack ? 'border-gold-400 bg-blush-100/60' : 'border-cream-200 bg-white')
           }
         >
           <input
+            id={policyAckId}
+            name="policyAck"
             type="checkbox"
+            required
             className="mt-0.5"
             checked={ack}
             onChange={(e) => setAck(e.target.checked)}
@@ -83,8 +87,8 @@ export default function PolicyScreen() {
           <span className="leading-snug">I have read and agree to the policies above.</span>
         </label>
         <p className="text-[11px] text-ink-500 leading-relaxed px-1">
-          By continuing, you authorize the med spa to contact you about your appointment and
-          process payments per the terms above.
+          By continuing, you authorize us to contact you about your appointment and process
+          payments per the terms above.
         </p>
       </div>
     </ScreenChrome>

@@ -116,19 +116,25 @@ export default function Calendar({
               disabled={disabled}
               onClick={() => setDay(d)}
               className={
-                'aspect-square rounded-lg text-sm num transition flex items-center justify-center ' +
+                'relative aspect-square rounded-lg text-sm num transition flex items-center justify-center ' +
                 (isSel
-                  ? 'bg-espresso-800 text-cream-100 shadow-soft'
+                  ? 'bg-espresso-800 text-cream-100 font-semibold shadow-soft'
                   : disabled
-                    ? 'text-ink-400/50 cursor-not-allowed'
+                    ? 'text-ink-400/40 cursor-not-allowed'
                     : isToday
-                      ? 'bg-gold-300/30 text-espresso-800 hover:bg-gold-300/50'
-                      : 'text-ink-700 hover:bg-cream-100')
+                      ? 'bg-gold-300/30 text-ink-900 font-semibold ring-1 ring-gold-400 hover:bg-gold-300/50'
+                      : 'text-ink-900 font-medium hover:bg-cream-200/70')
               }
               aria-pressed={isSel || undefined}
               aria-label={format(d, 'EEEE, MMMM d')}
             >
               {d.getDate()}
+              {!isSel && !disabled && !isToday && (
+                <span
+                  aria-hidden
+                  className="absolute bottom-1 left-1/2 h-[3px] w-[3px] -translate-x-1/2 rounded-full bg-accent"
+                />
+              )}
             </button>
           );
         })}
@@ -148,7 +154,7 @@ export default function Calendar({
           {slotsForDay.length === 0 ? (
             <div className="text-sm text-ink-500">No times available — pick another day.</div>
           ) : (
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {slotsForDay.map(({ slot, practitionerId }) => {
                 const isSel = selectedSlot === slot && isSameDay(day, selectedDate || day) && (!firstAvailableMode || selectedSlotPractitioner === practitionerId);
                 const p = findPractitionerById(practitionerId);
@@ -158,7 +164,7 @@ export default function Calendar({
                     type="button"
                     onClick={() => onPick({ date: day, slot, practitionerId })}
                     className={
-                      'rounded-lg px-3 py-2 text-xs num border transition flex flex-col items-start gap-0.5 ' +
+                      'rounded-lg px-3 py-2 text-xs num border transition flex flex-col items-start justify-center gap-0.5 min-h-[44px] md:min-h-[40px] ' +
                       (isSel
                         ? 'bg-espresso-800 text-cream-100 border-espresso-800'
                         : 'bg-white border-cream-200 text-ink-700 hover:border-gold-400 hover:bg-cream-50')

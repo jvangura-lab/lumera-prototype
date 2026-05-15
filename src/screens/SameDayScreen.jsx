@@ -23,8 +23,8 @@ export default function SameDayScreen() {
 
   const subtitle =
     practitioner && service
-      ? `If ${practitioner.name} approves, we can perform ${service.name} right after your consult. ${formatPrice(FEES.sameDayDeposit)} deposit secures the slot.`
-      : `If approved at your consult, we can perform the procedure right after. ${formatPrice(FEES.sameDayDeposit)} deposit secures the slot.`;
+      ? `If ${practitioner.name} approves, we can perform ${service.name} right after your consult — no second trip. A ${formatPrice(FEES.sameDayDeposit)} deposit holds the time.`
+      : `If approved at your consult, we can perform the procedure right after — no second trip. A ${formatPrice(FEES.sameDayDeposit)} deposit holds the time.`;
 
   return (
     <ScreenChrome

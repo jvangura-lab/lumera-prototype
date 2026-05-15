@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import SiteHeader from './site/SiteHeader.jsx';
 import SiteFooter from './site/SiteFooter.jsx';
 import PageHero from './site/PageHero.jsx';
 import AboutStrip from './site/AboutStrip.jsx';
 import TeamSection from './site/TeamSection.jsx';
+import TrustStrip from './site/TrustStrip.jsx';
+import FaqSection from './site/FaqSection.jsx';
+import TestimonialsSection from './site/TestimonialsSection.jsx';
 import ContactStrip from './site/ContactStrip.jsx';
+import MobileBookCTA from './site/MobileBookCTA.jsx';
 import BookingSection from './components/BookingSection.jsx';
 import { useBooking, STEPS } from './state/BookingContext.jsx';
 
@@ -45,20 +49,80 @@ const SCREENS = {
 export default function App() {
   const { state } = useBooking();
   const Screen = SCREENS[state.step] || BookingTypeScreen;
+  const firstStepRender = useRef(true);
+  const prevBookingStarted = useRef(false);
+
+  // True once the user has chosen a booking path. Going back to Step 1
+  // (via actions.back() or RESET) flips this back to false and the
+  // marketing sections reappear.
+  const bookingStarted =
+    state.step !== STEPS.BOOKING_TYPE || Boolean(state.bookingType);
+
+  // Whether marketing sections are actually mounted. We delay the
+  // unmount until AFTER the smooth-scroll to the booking heading
+  // completes — otherwise the page height drops mid-scroll, scrollY
+  // gets clamped, and the user briefly sees the footer before the
+  // scroll re-targets the heading.
+  const [marketingHidden, setMarketingHidden] = useState(false);
+
+  useEffect(() => {
+    if (firstStepRender.current) {
+      firstStepRender.current = false;
+      prevBookingStarted.current = bookingStarted;
+      setMarketingHidden(bookingStarted);
+      return;
+    }
+
+    if (bookingStarted && !prevBookingStarted.current) {
+      // Path just picked. Marketing is still mounted — smooth-scroll
+      // the heading to the top of the viewport first. By the time
+      // the timeout fires and we unmount, the marketing is already
+      // off-screen above, so removing it is visually inert.
+      const el = document.getElementById('booking-step-heading');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const t = window.setTimeout(() => setMarketingHidden(true), 650);
+      prevBookingStarted.current = bookingStarted;
+      return () => window.clearTimeout(t);
+    }
+
+    if (!bookingStarted) {
+      // Returned to Step 1 (or full reset). Re-mount marketing.
+      setMarketingHidden(false);
+      prevBookingStarted.current = bookingStarted;
+      return;
+    }
+
+    // Normal step-to-step transition inside the flow.
+    const el = document.getElementById('booking-step-heading');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    prevBookingStarted.current = bookingStarted;
+  }, [state.step, bookingStarted]);
 
   return (
     <div className="min-h-screen bg-bone text-ink-900">
       <SiteHeader />
-      <PageHero />
-      <AboutStrip />
+      {!marketingHidden && (
+        <>
+          <PageHero />
+          <AboutStrip />
+        </>
+      )}
       <main>
         <BookingSection>
           <Screen />
         </BookingSection>
       </main>
-      <TeamSection />
-      <ContactStrip />
+      {!marketingHidden && (
+        <>
+          <TrustStrip />
+          <TeamSection />
+          <TestimonialsSection />
+          <FaqSection />
+          <ContactStrip />
+        </>
+      )}
       <SiteFooter />
+      <MobileBookCTA hidden={bookingStarted} />
     </div>
   );
 }
