@@ -2,18 +2,23 @@
 # Substitute PROJECT_ID, _SERVICE_NAME, _REGION at deploy time, e.g.:
 #   gcloud builds submit --config=cloudbuild.yaml \
 #     --substitutions=_SERVICE_NAME=magnolia-prototype,_REGION=us-central1 .
+#
+# _TAG defaults to "latest" so manual local `gcloud builds submit` works.
+# When triggered by Cloud Build's GitHub integration, override _TAG with
+# ${SHORT_SHA} via the trigger's substitution overrides.
 
 substitutions:
   _SERVICE_NAME: magnolia-prototype
   _REGION: us-central1
+  _TAG: latest
   _IMAGE: gcr.io/${PROJECT_ID}/${_SERVICE_NAME}
 
 steps:
   - name: gcr.io/cloud-builders/docker
-    args: ['build', '-t', '${_IMAGE}:${SHORT_SHA}', '-t', '${_IMAGE}:latest', '.']
+    args: ['build', '-t', '${_IMAGE}:${_TAG}', '.']
 
   - name: gcr.io/cloud-builders/docker
-    args: ['push', '--all-tags', '${_IMAGE}']
+    args: ['push', '${_IMAGE}:${_TAG}']
 
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     entrypoint: gcloud
@@ -21,7 +26,7 @@ steps:
       - run
       - deploy
       - ${_SERVICE_NAME}
-      - --image=${_IMAGE}:${SHORT_SHA}
+      - --image=${_IMAGE}:${_TAG}
       - --region=${_REGION}
       - --platform=managed
       - --allow-unauthenticated
@@ -34,8 +39,8 @@ steps:
       - --port=8080
 
 images:
-  - '${_IMAGE}:${SHORT_SHA}'
-  - '${_IMAGE}:latest'
+  - '${_IMAGE}:${_TAG}'
 
 options:
   logging: CLOUD_LOGGING_ONLY
+  dynamic_substitutions: true
