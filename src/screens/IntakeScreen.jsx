@@ -44,19 +44,19 @@ export default function IntakeScreen() {
     if (check('fullName') && !data.fullName.trim()) e.fullName = 'Required';
     if (check('email')) {
       if (!data.email.trim()) e.email = 'Required';
-      else if (!isValidEmail(data.email)) e.email = 'Enter a valid email';
+      else if (!isValidEmail(data.email)) e.email = "Doesn't look like a valid email.";
     }
     if (check('phone')) {
       const d = normalizePhone(data.phone);
       if (!d) e.phone = 'Required';
-      else if (d.length !== 10) e.phone = 'Enter a 10-digit phone number';
+      else if (d.length !== 10) e.phone = 'Phone should be 10 digits.';
     }
     if (check('dob')) {
       if (!data.dob) e.dob = 'Required';
       else {
         const age = ageFromDOB(data.dob);
-        if (age == null) e.dob = 'Enter a valid date';
-        else if (age < 18) e.dob = 'Patients must be 18 or older';
+        if (age == null) e.dob = "That date doesn't look right.";
+        else if (age < 18) e.dob = 'Must be 18 or older.';
       }
     }
     if (check('newOrReturning') && !data.newOrReturning) e.newOrReturning = 'Required';
@@ -101,7 +101,7 @@ export default function IntakeScreen() {
 
   return (
     <ScreenChrome
-      title="Your details."
+      title="Tell us about you."
       subtitle="* required"
     >
       <form onSubmit={handleSubmit} className="space-y-2.5" noValidate>
@@ -153,7 +153,7 @@ export default function IntakeScreen() {
           />
         </Field>
 
-        <Field id={ids.dob} label="Date of birth" required error={touched.dob && errors.dob} hint="Patients must be 18 or older.">
+        <Field id={ids.dob} label="Date of birth" required error={touched.dob && errors.dob} hint="Must be 18 or older.">
           <input
             ref={refs.dob}
             id={ids.dob}
@@ -262,7 +262,7 @@ export default function IntakeScreen() {
                 onBlur={() => onBlur('healthAck')}
               />
               <span>
-                I confirm I have disclosed all relevant health information and understand the procedure-day acknowledgements.
+                I confirm I've disclosed all relevant health information and understand what to expect on procedure day.
                 <span className="text-blush-500"> *</span>
               </span>
             </label>
