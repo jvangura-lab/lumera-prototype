@@ -13,10 +13,22 @@ export default function SiteHeader() {
 
   const handleBookClick = (e) => {
     e.preventDefault();
-    const target = document.getElementById(BOOKING_ANCHOR_ID);
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Prefer scrolling to the booking heading directly so the whole
+    // step (heading + options + Continue button) fits in the viewport.
+    // Scrolling to the section anchor lands too low — its 96px of top
+    // padding pushes the Continue button below the fold on Step 1.
+    const heading = document.getElementById('booking-step-heading');
+    if (heading) {
+      const stickyHeader = document.querySelector('header');
+      const stickyOffset = stickyHeader ? stickyHeader.offsetHeight : 72;
+      const breathingRoom = 16;
+      const y = window.scrollY + heading.getBoundingClientRect().top - stickyOffset - breathingRoom;
+      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+      return;
     }
+    // Fallback if the heading isn't mounted yet.
+    const target = document.getElementById(BOOKING_ANCHOR_ID);
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   return (
