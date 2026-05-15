@@ -4,6 +4,7 @@ import SiteFooter from './site/SiteFooter.jsx';
 import PageHero from './site/PageHero.jsx';
 import AboutStrip from './site/AboutStrip.jsx';
 import TeamSection from './site/TeamSection.jsx';
+import TrustStrip from './site/TrustStrip.jsx';
 import ContactStrip from './site/ContactStrip.jsx';
 import MobileBookCTA from './site/MobileBookCTA.jsx';
 import BookingSection from './components/BookingSection.jsx';
@@ -111,6 +112,7 @@ export default function App() {
       </main>
       {!marketingHidden && (
         <>
+          <TrustStrip />
           <TeamSection />
           <ContactStrip />
         </>
