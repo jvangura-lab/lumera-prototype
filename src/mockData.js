@@ -128,7 +128,7 @@ export const PRACTITIONERS = [
     initials: 'SC',
     accent: 'blush',
     specialties: ['Botox', 'Filler', 'Sculptra', 'Laser', 'PRP', 'CoolSculpting', 'Microneedling'],
-    bio: '12 years in medical aesthetics.',
+    bio: "12 years in medical aesthetics. Sarah's approach is precise and conservative — she'd rather under-treat at first and refine than overdo it.",
     services: ['botox', 'filler', 'sculptra', 'laser-hair', 'prp', 'coolsculpting', 'microneedling'],
   },
   {
@@ -138,7 +138,7 @@ export const PRACTITIONERS = [
     initials: 'JM',
     accent: 'gold',
     specialties: ['Botox', 'Filler', 'Sculptra', 'PRP', 'Microneedling'],
-    bio: 'Natural-looking injectables.',
+    bio: "Natural-looking injectables. Most of Jessica's clients want friends to compliment them, not notice the Botox.",
     services: ['botox', 'filler', 'sculptra', 'prp', 'microneedling'],
   },
   {
@@ -148,7 +148,7 @@ export const PRACTITIONERS = [
     initials: 'AR',
     accent: 'cream',
     specialties: ['HydraFacial', 'Diamond Glow', 'Microneedling', 'Chemical Peel', 'Laser'],
-    bio: 'Personalized skin-care plans.',
+    bio: "Personalized skin-care plans. Amanda builds routines around real lives — not 12-step regimens nobody follows.",
     services: ['hydrafacial', 'diamond-glow', 'microneedling', 'chemical-peel', 'laser-hair'],
   },
   {
@@ -158,7 +158,7 @@ export const PRACTITIONERS = [
     initials: 'MP',
     accent: 'espresso',
     specialties: ['IV Therapy', 'B12', 'CoolSculpting', 'PRP'],
-    bio: 'Wellness and aesthetic medicine.',
+    bio: "Wellness and aesthetic medicine. Michael blends preventive care with aesthetics — most clients come for one and stay for both.",
     services: ['iv-therapy', 'b12', 'coolsculpting', 'prp'],
   },
   {
@@ -168,7 +168,7 @@ export const PRACTITIONERS = [
     initials: 'TB',
     accent: 'blush',
     specialties: ['Botox', 'Filler', 'IV Therapy', 'B12'],
-    bio: 'Aesthetics and wellness.',
+    bio: "Aesthetics and wellness. Taylor specializes in subtle enhancements paired with IV protocols for sustained results.",
     services: ['botox', 'filler', 'iv-therapy', 'b12'],
   },
 ];

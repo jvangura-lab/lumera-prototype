@@ -1,5 +1,6 @@
 import React from 'react';
 import { PRACTITIONERS } from '../mockData.js';
+import Tooltip from '../components/Tooltip.jsx';
 
 // Curated Unsplash portrait URLs paired to the funnel's practitioners
 // (synced names/credentials/specialties per Phase 2 decision 3).
@@ -9,6 +10,13 @@ const PORTRAITS = {
   reyes:    'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=600&h=720&q=80',
   park:     'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=600&h=720&q=80',
   brooks:   'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&h=720&q=80',
+};
+
+const CREDENTIAL_LABELS = {
+  MD: 'Doctor of Medicine',
+  RN: 'Registered Nurse',
+  BSN: 'Bachelor of Science in Nursing',
+  LE: 'Licensed Esthetician',
 };
 
 export default function TeamSection() {
@@ -46,7 +54,7 @@ export default function TeamSection() {
                   {p.name}
                 </div>
                 <div className="mt-1 font-sans text-[12px] uppercase tracking-eyebrow text-accent-strong">
-                  {p.credentials}
+                  <CredentialList credentials={p.credentials} />
                 </div>
                 <p className="mt-3 font-sans text-[15px] leading-relaxed text-ink-700">
                   {p.bio}
@@ -63,5 +71,27 @@ export default function TeamSection() {
         </div>
       </div>
     </section>
+  );
+}
+
+function CredentialList({ credentials }) {
+  // Split on comma so "RN, BSN" yields two tokens, each tooltipped.
+  const tokens = credentials.split(',').map((t) => t.trim()).filter(Boolean);
+  return (
+    <>
+      {tokens.map((tok, i) => {
+        const label = CREDENTIAL_LABELS[tok];
+        return (
+          <React.Fragment key={`${tok}-${i}`}>
+            {i > 0 && <span className="mx-1">,</span>}
+            {label ? (
+              <Tooltip label={label}>{tok}</Tooltip>
+            ) : (
+              <span>{tok}</span>
+            )}
+          </React.Fragment>
+        );
+      })}
+    </>
   );
 }
