@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { PRACTITIONERS } from '../mockData.js';
 import Tooltip from '../components/Tooltip.jsx';
 import { Reveal, StaggerChildren } from '../motion/MotionPrimitives.jsx';
+import { useKenBurns } from '../motion/useKenBurns.js';
 import { EASE, STAGGER } from '../motion/tokens.js';
 
 // Curated Unsplash portrait URLs paired to the funnel's practitioners
@@ -59,17 +60,15 @@ export default function TeamSection() {
           delayChildren={0.15}
           className="mt-14 grid gap-10 sm:grid-cols-2 lg:grid-cols-3"
         >
-          {PRACTITIONERS.map((p) => (
+          {PRACTITIONERS.map((p, i) => (
             <motion.article key={p.id} variants={cardVariants} className="group flex flex-col">
-              <div className="relative aspect-[5/6] overflow-hidden bg-[#F3ECE0] shadow-soft">
-                <img
+              <div className="relative aspect-[5/6] overflow-hidden bg-[#F3ECE0] shadow-card">
+                <PortraitImage
                   src={PORTRAITS[p.id]}
                   alt={`${p.name}, ${p.credentials}`}
-                  className="h-full w-full object-cover transition-transform duration-[800ms] ease-out group-hover:scale-[1.05]"
-                  loading="lazy"
-                  style={{ willChange: 'transform' }}
+                  index={i}
                 />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-accent-strong/15 via-transparent to-transparent opacity-0 transition-opacity duration-[250ms] group-hover:opacity-100" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-accent-strong/20 via-transparent to-transparent opacity-0 transition-opacity duration-[250ms] group-hover:opacity-100" />
               </div>
               <div className="mt-5">
                 <div className="font-display text-2xl font-medium leading-tight text-ink-900">
@@ -93,6 +92,29 @@ export default function TeamSection() {
         </StaggerChildren>
       </div>
     </section>
+  );
+}
+
+// Ken Burns wrapper around the portrait. Slight per-card duration drift
+// keeps the row from breathing in unison. The inner <img> handles hover
+// zoom via CSS transform — composes cleanly with the wrapper's GSAP
+// transform since they target different elements.
+function PortraitImage({ src, alt, index }) {
+  const kenRef = useKenBurns({
+    scale: 1.04,
+    drift: 2.2,
+    duration: 11 + (index % 3) * 1.5,
+  });
+  return (
+    <div ref={kenRef} className="absolute inset-0" style={{ willChange: 'transform' }}>
+      <img
+        src={src}
+        alt={alt}
+        className="h-full w-full object-cover transition-transform duration-[800ms] ease-out group-hover:scale-[1.05]"
+        loading="lazy"
+        style={{ willChange: 'transform' }}
+      />
+    </div>
   );
 }
 
