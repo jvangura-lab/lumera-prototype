@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import SiteHeader from './site/SiteHeader.jsx';
 import SiteFooter from './site/SiteFooter.jsx';
 import PageHero from './site/PageHero.jsx';
@@ -10,8 +11,13 @@ import TestimonialsSection from './site/TestimonialsSection.jsx';
 import ContactStrip from './site/ContactStrip.jsx';
 import MobileBookCTA from './site/MobileBookCTA.jsx';
 import BookingSection from './components/BookingSection.jsx';
-import { useBooking, STEPS } from './state/BookingContext.jsx';
+import { useBooking, STEPS, deriveFlow } from './state/BookingContext.jsx';
 import { useLenis } from './motion/LenisProvider.jsx';
+import {
+  stepForwardVariants,
+  stepBackwardVariants,
+  stepFadeVariants,
+} from './motion/variants.js';
 
 import BookingTypeScreen from './screens/BookingTypeScreen.jsx';
 import ServiceSelectScreen from './screens/ServiceSelectScreen.jsx';
@@ -50,9 +56,32 @@ const SCREENS = {
 export default function App() {
   const { state } = useBooking();
   const { scrollTo } = useLenis();
+  const reduced = useReducedMotion();
   const Screen = SCREENS[state.step] || BookingTypeScreen;
   const firstStepRender = useRef(true);
   const prevBookingStarted = useRef(false);
+
+  // Step-transition direction. Compare the active step's index in
+  // deriveFlow(state).path against the previous render's index.
+  const { path } = deriveFlow(state);
+  const currentIdx = Math.max(path.indexOf(state.step), 0);
+  const prevIdxRef = useRef(currentIdx);
+  const direction =
+    state.step === STEPS.BOOKING_TYPE
+      ? 'reset'
+      : currentIdx >= prevIdxRef.current
+        ? 'forward'
+        : 'backward';
+  useEffect(() => {
+    prevIdxRef.current = currentIdx;
+  });
+  const screenVariants = reduced
+    ? stepFadeVariants
+    : direction === 'backward'
+      ? stepBackwardVariants
+      : direction === 'reset'
+        ? stepFadeVariants
+        : stepForwardVariants;
 
   // True once the user has chosen a booking path. Going back to Step 1
   // (via actions.back() or RESET) flips this back to false and the
@@ -111,7 +140,23 @@ export default function App() {
       )}
       <main>
         <BookingSection>
-          <Screen />
+          {/* Keyed motion.div, no AnimatePresence. AnimatePresence in
+              framer-motion 12.x preserves the OLD subtree across the
+              exit phase, which combined with <Screen /> as a JSX
+              child causes the next motion.div to mount with the prior
+              Screen's content. Without AnimatePresence, React unmounts
+              the old screen instantly and mounts the new — the new
+              plays its entrance variant. Direction-aware enter still
+              communicates forward/backward intent; the missing exit
+              animation is a deliberate trade for correctness. */}
+          <motion.div
+            key={state.step}
+            variants={screenVariants}
+            initial="initial"
+            animate="animate"
+          >
+            <Screen />
+          </motion.div>
         </BookingSection>
       </main>
       {!marketingHidden && (
