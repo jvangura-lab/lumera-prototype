@@ -9,18 +9,18 @@ export default function SelectCard({ selected, onClick, disabled, title, subtitl
       disabled={disabled}
       aria-pressed={selected}
       className={
-        'group relative w-full rounded-sm border text-left transition px-5 py-5 md:px-6 md:py-6 ' +
+        'group relative w-full rounded-sm border text-left transition-[background-color,border-color,box-shadow] duration-[250ms] ease-out px-5 py-5 md:px-6 md:py-6 ' +
         (disabled
           ? 'cursor-not-allowed border-[#E7DDCC] bg-[#F3ECE0]/50 text-ink-500 '
           : selected
             ? 'border-ink-900 bg-white shadow-soft '
-            : 'border-[#E2D6C3] bg-white hover:border-ink-700 ')
+            : 'border-[#E2D6C3] bg-white hover:border-ink-700 hover:bg-[#FBF7EE] ')
       }
     >
       <div className="flex items-start gap-4">
         <span
           className={
-            'mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition ' +
+            'mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors duration-[200ms] ' +
             (selected
               ? 'border-accent-strong bg-accent-strong text-bone'
               : 'border-ink-300 bg-white')
