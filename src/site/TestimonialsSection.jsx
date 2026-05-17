@@ -1,5 +1,8 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
+import { Reveal, StaggerChildren } from '../motion/MotionPrimitives.jsx';
+import { EASE, STAGGER } from '../motion/tokens.js';
 
 const TESTIMONIALS = [
   {
@@ -25,24 +28,42 @@ const TESTIMONIALS = [
   },
 ];
 
+const cardVariants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
+};
+
 export default function TestimonialsSection() {
   return (
     <section id="reviews" className="border-b border-[#E2D6C3] bg-[#F7F1E4]">
       <div className="mx-auto max-w-site px-6 py-20 md:px-10 md:py-24">
         <div className="max-w-3xl">
-          <div className="font-sans text-[11px] uppercase tracking-eyebrow text-accent-strong">
+          <Reveal className="font-sans text-[11px] uppercase tracking-eyebrow text-accent-strong">
             What patients say
-          </div>
-          <h2 className="mt-3 font-display text-3xl font-medium tracking-tight text-ink-900 md:text-5xl">
+          </Reveal>
+          <Reveal
+            as="h2"
+            delay={0.1}
+            className="mt-3 font-display text-3xl font-medium tracking-tight text-ink-900 md:text-5xl"
+          >
             Quietly raving.
-          </h2>
+          </Reveal>
         </div>
 
-        <div className="mt-12 grid gap-8 md:grid-cols-3">
+        <StaggerChildren
+          stagger={STAGGER.testimonial}
+          delayChildren={0.15}
+          className="mt-12 grid gap-8 md:grid-cols-3"
+        >
           {TESTIMONIALS.map((t) => (
-            <figure
+            <motion.figure
               key={t.name}
-              className="flex h-full flex-col justify-between border-t border-accent/40 pt-6"
+              variants={cardVariants}
+              whileHover={{
+                y: -6,
+                transition: { duration: 0.3, ease: EASE },
+              }}
+              className="flex h-full flex-col justify-between border-t border-accent/40 pt-6 transition-shadow duration-300 hover:shadow-soft"
             >
               <blockquote className="font-display text-[20px] italic leading-snug text-ink-900 md:text-[22px]">
                 &ldquo;{t.quote}&rdquo;
@@ -58,9 +79,9 @@ export default function TestimonialsSection() {
                   Verified visit
                 </div>
               </figcaption>
-            </figure>
+            </motion.figure>
           ))}
-        </div>
+        </StaggerChildren>
       </div>
     </section>
   );
