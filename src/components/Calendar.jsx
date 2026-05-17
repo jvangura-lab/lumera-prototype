@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   addMonths, eachDayOfInterval, endOfMonth, format, isBefore, isSameDay,
   isSameMonth, startOfDay, startOfMonth, addDays, subMonths,
@@ -8,6 +9,7 @@ import {
   getPractitionerSlots, getAggregateSlots, dayHasAvailability, formatSlotLabel,
 } from '../utils/availability.js';
 import { findPractitionerById } from '../mockData.js';
+import { EASE } from '../motion/tokens.js';
 
 export default function Calendar({
   practitionerIds,           // [string]
@@ -116,9 +118,9 @@ export default function Calendar({
               disabled={disabled}
               onClick={() => setDay(d)}
               className={
-                'relative aspect-square rounded-lg text-sm num transition flex items-center justify-center ' +
+                'relative aspect-square rounded-lg text-sm num transition-colors duration-[200ms] flex items-center justify-center ' +
                 (isSel
-                  ? 'bg-espresso-800 text-cream-100 font-semibold shadow-soft'
+                  ? 'text-cream-100 font-semibold'
                   : disabled
                     ? 'text-ink-400/40 cursor-not-allowed'
                     : isToday
@@ -128,7 +130,15 @@ export default function Calendar({
               aria-pressed={isSel || undefined}
               aria-label={format(d, 'EEEE, MMMM d')}
             >
-              {d.getDate()}
+              {isSel && (
+                <motion.span
+                  layoutId="calendar-day-fill"
+                  className="absolute inset-0 rounded-lg bg-espresso-800 shadow-soft"
+                  transition={{ duration: 0.25, ease: EASE }}
+                  aria-hidden
+                />
+              )}
+              <span className="relative z-10">{d.getDate()}</span>
               {!isSel && !disabled && !isToday && (
                 <span
                   aria-hidden
@@ -146,43 +156,59 @@ export default function Calendar({
         </div>
       )}
 
-      {day && (
-        <div className="pt-2 fade-in-up">
-          <div className="text-xs text-ink-500 mb-2">
-            {format(day, 'EEEE, MMMM d')} · Available times <span className="num">(ET)</span>
-          </div>
-          {slotsForDay.length === 0 ? (
-            <div className="text-sm text-ink-500">No times available — pick another day.</div>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {slotsForDay.map(({ slot, practitionerId }) => {
-                const isSel = selectedSlot === slot && isSameDay(day, selectedDate || day) && (!firstAvailableMode || selectedSlotPractitioner === practitionerId);
-                const p = findPractitionerById(practitionerId);
-                return (
-                  <button
-                    key={slot + practitionerId}
-                    type="button"
-                    onClick={() => onPick({ date: day, slot, practitionerId })}
-                    className={
-                      'rounded-lg px-3 py-2 text-xs num border transition flex flex-col items-start justify-center gap-0.5 min-h-[44px] md:min-h-[40px] ' +
-                      (isSel
-                        ? 'bg-espresso-800 text-cream-100 border-espresso-800'
-                        : 'bg-white border-cream-200 text-ink-700 hover:border-gold-400 hover:bg-cream-50')
-                    }
-                  >
-                    <span className="font-semibold">{formatSlotLabel(slot)}</span>
-                    {firstAvailableMode && p && (
-                      <span className={'text-[10px] ' + (isSel ? 'text-cream-200/80' : 'text-ink-500')}>
-                        with {p.name}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
+      <AnimatePresence initial={false}>
+        {day && (
+          <motion.div
+            key={day.toISOString()}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0, transition: { duration: 0.3, ease: EASE } }}
+            exit={{ opacity: 0, transition: { duration: 0.15, ease: EASE } }}
+            className="pt-2"
+          >
+            <div className="text-xs text-ink-500 mb-2">
+              {format(day, 'EEEE, MMMM d')} · Available times <span className="num">(ET)</span>
             </div>
-          )}
-        </div>
-      )}
+            {slotsForDay.length === 0 ? (
+              <div className="text-sm text-ink-500">No times available — pick another day.</div>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {slotsForDay.map(({ slot, practitionerId }) => {
+                  const isSel = selectedSlot === slot && isSameDay(day, selectedDate || day) && (!firstAvailableMode || selectedSlotPractitioner === practitionerId);
+                  const p = findPractitionerById(practitionerId);
+                  return (
+                    <button
+                      key={slot + practitionerId}
+                      type="button"
+                      onClick={() => onPick({ date: day, slot, practitionerId })}
+                      className={
+                        'relative rounded-lg px-3 py-2 text-xs num border transition-colors duration-[200ms] flex flex-col items-start justify-center gap-0.5 min-h-[44px] md:min-h-[40px] ' +
+                        (isSel
+                          ? 'text-cream-100 border-espresso-800'
+                          : 'bg-white border-cream-200 text-ink-700 hover:border-gold-400 hover:bg-cream-50')
+                      }
+                    >
+                      {isSel && (
+                        <motion.span
+                          layoutId="calendar-slot-fill"
+                          className="absolute inset-0 rounded-lg bg-espresso-800"
+                          transition={{ duration: 0.2, ease: EASE }}
+                          aria-hidden
+                        />
+                      )}
+                      <span className="relative z-10 font-semibold">{formatSlotLabel(slot)}</span>
+                      {firstAvailableMode && p && (
+                        <span className={'relative z-10 text-[10px] ' + (isSel ? 'text-cream-200/80' : 'text-ink-500')}>
+                          with {p.name}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

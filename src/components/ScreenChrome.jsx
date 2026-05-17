@@ -10,7 +10,7 @@ export default function ScreenChrome({ title, subtitle, eyebrow, children, foote
     && state.step !== STEPS.CONFIRMATION;
 
   return (
-    <div className="fade-in-up">
+    <div>
       {canBack && (
         <button
           type="button"
