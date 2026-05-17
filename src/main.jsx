@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import { BookingProvider } from './state/BookingContext.jsx';
 import LenisProvider from './motion/LenisProvider.jsx';
+import GrainOverlay from './motion/GrainOverlay.jsx';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -10,6 +11,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <BookingProvider>
       <LenisProvider>
         <App />
+        <GrainOverlay />
       </LenisProvider>
     </BookingProvider>
   </React.StrictMode>
