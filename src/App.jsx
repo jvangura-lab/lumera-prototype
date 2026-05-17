@@ -11,6 +11,7 @@ import ContactStrip from './site/ContactStrip.jsx';
 import MobileBookCTA from './site/MobileBookCTA.jsx';
 import BookingSection from './components/BookingSection.jsx';
 import { useBooking, STEPS } from './state/BookingContext.jsx';
+import { useLenis } from './motion/LenisProvider.jsx';
 
 import BookingTypeScreen from './screens/BookingTypeScreen.jsx';
 import ServiceSelectScreen from './screens/ServiceSelectScreen.jsx';
@@ -48,6 +49,7 @@ const SCREENS = {
 
 export default function App() {
   const { state } = useBooking();
+  const { scrollTo } = useLenis();
   const Screen = SCREENS[state.step] || BookingTypeScreen;
   const firstStepRender = useRef(true);
   const prevBookingStarted = useRef(false);
@@ -79,8 +81,8 @@ export default function App() {
       // the timeout fires and we unmount, the marketing is already
       // off-screen above, so removing it is visually inert.
       const el = document.getElementById('booking-step-heading');
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      const t = window.setTimeout(() => setMarketingHidden(true), 650);
+      if (el) scrollTo(el, { duration: 0.7 });
+      const t = window.setTimeout(() => setMarketingHidden(true), 700);
       prevBookingStarted.current = bookingStarted;
       return () => window.clearTimeout(t);
     }
@@ -94,9 +96,9 @@ export default function App() {
 
     // Normal step-to-step transition inside the flow.
     const el = document.getElementById('booking-step-heading');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (el) scrollTo(el, { duration: 0.7 });
     prevBookingStarted.current = bookingStarted;
-  }, [state.step, bookingStarted]);
+  }, [state.step, bookingStarted, scrollTo]);
 
   return (
     <div className="min-h-screen bg-bone text-ink-900">

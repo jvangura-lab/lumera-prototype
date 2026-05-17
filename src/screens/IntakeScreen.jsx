@@ -1,12 +1,16 @@
 import React, { useId, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import ScreenChrome from '../components/ScreenChrome.jsx';
 import { PrimaryButton } from '../components/Button.jsx';
 import { useBooking, STEPS, BOOKING_TYPES } from '../state/BookingContext.jsx';
 import { HEAR_ABOUT_OPTIONS } from '../mockData.js';
 import { formatPhone, isValidEmail, normalizePhone, ageFromDOB } from '../utils/formatting.js';
+import { useLenis } from '../motion/LenisProvider.jsx';
+import { errorVariants } from '../motion/variants.js';
 
 export default function IntakeScreen() {
   const { state, actions } = useBooking();
+  const { scrollTo } = useLenis();
   const [intake, setIntake] = useState(state.intake);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
@@ -94,7 +98,7 @@ export default function IntakeScreen() {
       const first = order.find((k) => all[k]);
       if (first && refs[first]?.current) {
         refs[first].current.focus();
-        refs[first].current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        scrollTo(refs[first].current, { offset: -window.innerHeight / 2 + 40, duration: 0.6 });
       }
     }
   };
@@ -296,7 +300,20 @@ function Field({ id, as = 'div', label, required, error, hint, children }) {
       )}
       {children}
       {hint && !error && <div className="text-[11px] text-ink-400 mt-1">{hint}</div>}
-      {error && <div className="text-[11px] text-blush-500 mt-1">{error}</div>}
+      <AnimatePresence initial={false}>
+        {error && (
+          <motion.div
+            key="err"
+            variants={errorVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="text-[11px] text-blush-500 mt-1"
+          >
+            {error}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Wrapper>
   );
 }

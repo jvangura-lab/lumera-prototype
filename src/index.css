@@ -51,4 +51,5 @@ a:focus-visible,
 }
 .fade-in-up { animation: fadeInUp 220ms ease-out both; }
 
-html { scroll-behavior: smooth; }
+/* Lenis is the single source of scroll truth on desktop (see src/motion/LenisProvider.jsx).
+   On touch and prefers-reduced-motion, native scroll handles smoothing. */

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { BRAND, NAV_LINKS, BOOKING_ANCHOR_ID } from './brand.js';
+import { useLenis } from '../motion/LenisProvider.jsx';
 
 export default function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
+  const { scrollTo } = useLenis();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -22,13 +24,12 @@ export default function SiteHeader() {
       const stickyHeader = document.querySelector('header');
       const stickyOffset = stickyHeader ? stickyHeader.offsetHeight : 72;
       const breathingRoom = 16;
-      const y = window.scrollY + heading.getBoundingClientRect().top - stickyOffset - breathingRoom;
-      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+      scrollTo(heading, { offset: -(stickyOffset + breathingRoom), duration: 0.9 });
       return;
     }
     // Fallback if the heading isn't mounted yet.
     const target = document.getElementById(BOOKING_ANCHOR_ID);
-    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (target) scrollTo(target, { duration: 0.9 });
   };
 
   return (
