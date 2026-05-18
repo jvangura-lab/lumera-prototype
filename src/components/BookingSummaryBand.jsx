@@ -1,4 +1,5 @@
 import React from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { format, parseISO } from 'date-fns';
 import {
   useBooking,
@@ -13,6 +14,7 @@ import {
 } from '../mockData.js';
 import { formatPrice, formatDuration } from '../utils/formatting.js';
 import { formatSlotLabel } from '../utils/availability.js';
+import { summaryPartVariants } from '../motion/variants.js';
 
 // Show the running summary once the user has at least picked a
 // practitioner — useful at Calendar, Same-Day, Intake, Policy, and
@@ -38,26 +40,29 @@ export default function BookingSummaryBand() {
   const practitioner = pickPractitioner(state);
   const apt = state.appointment;
 
-  // Build a short list of separator-delimited fragments — skip any
-  // missing piece so partial selections don't render dangling dots.
+  // Build named parts with stable keys so AnimatePresence can fade-replace
+  // a single slot when its value changes without disturbing siblings.
   const parts = [];
 
   if (series) {
-    parts.push(series.name);
-    parts.push(`${series.sessions} sessions`);
-    parts.push(formatPrice(series.totalPrice));
+    parts.push({ key: 'name', value: series.name });
+    parts.push({ key: 'count', value: `${series.sessions} sessions` });
+    parts.push({ key: 'price', value: formatPrice(series.totalPrice) });
   } else if (service) {
-    parts.push(service.name);
-    parts.push(formatDuration(service.duration));
-    parts.push(formatPrice(service.price));
+    parts.push({ key: 'name', value: service.name });
+    parts.push({ key: 'duration', value: formatDuration(service.duration) });
+    parts.push({ key: 'price', value: formatPrice(service.price) });
   }
 
-  if (practitioner) parts.push(practitioner.name);
+  if (practitioner) parts.push({ key: 'practitioner', value: practitioner.name });
 
   if (apt?.dateIso && apt?.slot) {
     try {
       const d = parseISO(apt.dateIso);
-      parts.push(`${format(d, 'EEE MMM d')}, ${formatSlotLabel(apt.slot)}`);
+      parts.push({
+        key: 'appointment',
+        value: `${format(d, 'EEE MMM d')}, ${formatSlotLabel(apt.slot)}`,
+      });
     } catch {
       /* date-fns will throw on bad input; just skip */
     }
@@ -76,9 +81,9 @@ export default function BookingSummaryBand() {
         </span>
         <span className="font-sans text-[13px] text-ink-900 num">
           {parts.map((p, i) => (
-            <React.Fragment key={i}>
+            <React.Fragment key={p.key}>
               {i > 0 && <span className="mx-2 text-ink-400">·</span>}
-              {p}
+              <SummaryPart value={p.value} slotKey={p.key} />
             </React.Fragment>
           ))}
         </span>
@@ -89,6 +94,25 @@ export default function BookingSummaryBand() {
         )}
       </div>
     </div>
+  );
+}
+
+function SummaryPart({ value, slotKey }) {
+  return (
+    <span className="relative inline-flex">
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.span
+          key={`${slotKey}:${value}`}
+          variants={summaryPartVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          className="inline-flex"
+        >
+          {value}
+        </motion.span>
+      </AnimatePresence>
+    </span>
   );
 }
 

@@ -1,5 +1,8 @@
 import React, { useId, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
+import { Reveal, StaggerChildren } from '../motion/MotionPrimitives.jsx';
+import { EASE, STAGGER } from '../motion/tokens.js';
 
 const FAQ = [
   {
@@ -28,6 +31,11 @@ const FAQ = [
   },
 ];
 
+const itemVariants = {
+  hidden: { opacity: 0, y: 18 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
+};
+
 export default function FaqSection() {
   const [openIdx, setOpenIdx] = useState(null);
   const idBase = useId();
@@ -37,29 +45,46 @@ export default function FaqSection() {
       <div className="mx-auto max-w-site px-6 py-20 md:px-10 md:py-24">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <div className="font-sans text-[11px] uppercase tracking-eyebrow text-accent-strong">
+            <Reveal className="font-sans text-[11px] uppercase tracking-eyebrow text-accent-strong">
               Frequently asked
-            </div>
-            <h2 className="mt-3 max-w-2xl font-display text-3xl font-medium tracking-tight text-ink-900 md:text-5xl">
+            </Reveal>
+            <Reveal
+              as="h2"
+              delay={0.1}
+              className="mt-3 max-w-2xl font-display text-3xl font-medium tracking-tight text-ink-900 md:text-5xl"
+            >
               Common questions, answered.
-            </h2>
+            </Reveal>
           </div>
-          <p className="max-w-md font-sans text-[15px] leading-relaxed text-ink-700">
+          <Reveal
+            as="p"
+            delay={0.2}
+            className="max-w-md font-sans text-[15px] leading-relaxed text-ink-700"
+          >
             Still have questions? Call the spa at{' '}
             <a href="tel:+18135550142" className="text-ink-900 underline-offset-4 hover:underline">
               (813) 555-0142
             </a>{' '}
             — we'll answer before you book.
-          </p>
+          </Reveal>
         </div>
 
-        <ul className="mt-12 divide-y divide-[#E2D6C3] border-y border-[#E2D6C3]">
+        <StaggerChildren
+          as="ul"
+          stagger={STAGGER.card}
+          delayChildren={0.1}
+          className="mt-12 divide-y divide-[#E2D6C3] border-y border-[#E2D6C3]"
+        >
           {FAQ.map(({ q, a }, i) => {
             const open = openIdx === i;
             const panelId = `${idBase}-panel-${i}`;
             const headerId = `${idBase}-header-${i}`;
             return (
-              <li key={q}>
+              <motion.li
+                key={q}
+                variants={itemVariants}
+                className="transition-colors duration-[250ms] hover:bg-[#F3ECE0]/60"
+              >
                 <h3>
                   <button
                     type="button"
@@ -67,33 +92,47 @@ export default function FaqSection() {
                     aria-controls={panelId}
                     aria-expanded={open}
                     onClick={() => setOpenIdx(open ? null : i)}
-                    className="flex w-full items-center justify-between gap-4 py-5 text-left font-sans text-[16px] text-ink-900 transition-colors hover:text-accent-strong md:text-[18px]"
+                    className="flex w-full items-center justify-between gap-4 px-1 py-5 text-left font-sans text-[16px] text-ink-900 transition-colors duration-[250ms] hover:text-accent-strong md:text-[18px]"
                   >
                     <span className="font-display tracking-tight">{q}</span>
-                    <ChevronDown
-                      className={
-                        'h-4 w-4 shrink-0 transition-transform duration-200 ' +
-                        (open ? 'rotate-180 text-accent-strong' : 'text-ink-500')
-                      }
-                      strokeWidth={2}
-                      aria-hidden
-                    />
+                    <motion.span
+                      animate={{ rotate: open ? 180 : 0 }}
+                      transition={{ duration: 0.3, ease: EASE }}
+                      className="inline-flex"
+                    >
+                      <ChevronDown
+                        className={
+                          'h-4 w-4 shrink-0 ' + (open ? 'text-accent-strong' : 'text-ink-500')
+                        }
+                        strokeWidth={2}
+                        aria-hidden
+                      />
+                    </motion.span>
                   </button>
                 </h3>
-                {open && (
-                  <div
-                    id={panelId}
-                    role="region"
-                    aria-labelledby={headerId}
-                    className="pb-5 pr-8 font-sans text-[15px] leading-relaxed text-ink-700 fade-in-up"
-                  >
-                    {a}
-                  </div>
-                )}
-              </li>
+                <AnimatePresence initial={false}>
+                  {open && (
+                    <motion.div
+                      key="content"
+                      id={panelId}
+                      role="region"
+                      aria-labelledby={headerId}
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.35, ease: EASE }}
+                      style={{ overflow: 'hidden' }}
+                    >
+                      <div className="pb-5 pr-8 pl-1 font-sans text-[15px] leading-relaxed text-ink-700">
+                        {a}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.li>
             );
           })}
-        </ul>
+        </StaggerChildren>
       </div>
     </section>
   );

@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { format, parseISO } from 'date-fns';
 import { CalendarPlus, CheckCircle2, RefreshCw } from 'lucide-react';
 import ScreenChrome from '../components/ScreenChrome.jsx';
@@ -9,6 +10,8 @@ import { findServiceById, findSeriesById, findPractitionerById, PLACEHOLDERS, FE
 import { formatPrice } from '../utils/formatting.js';
 import { formatSlotLabel } from '../utils/availability.js';
 import { buildIcs, downloadIcs, appointmentDateTime, endDateTime } from '../utils/ics.js';
+import { Reveal } from '../motion/MotionPrimitives.jsx';
+import { EASE } from '../motion/tokens.js';
 
 export default function ConfirmationScreen() {
   const { state, actions } = useBooking();
@@ -79,22 +82,37 @@ export default function ConfirmationScreen() {
   return (
     <ScreenChrome hideBack>
       <div className="text-center py-2">
-        <div className="w-14 h-14 mx-auto rounded-full bg-gold-300/30 flex items-center justify-center mb-3">
-          <CheckCircle2 className="w-7 h-7 text-gold-600" strokeWidth={2.5} />
-        </div>
-        <h1
+        <CheckRing />
+        <Reveal
+          onMount
+          as="h1"
+          y={16}
+          duration={0.6}
           id="booking-step-heading"
           className="scroll-mt-[100px] font-display text-3xl text-espresso-900 mb-1"
           style={{ fontWeight: 600 }}
         >
           You're booked.
-        </h1>
-        <p className="text-sm text-ink-500">
+        </Reveal>
+        <Reveal
+          onMount
+          as="p"
+          delay={0.15}
+          y={16}
+          duration={0.6}
+          className="text-sm text-ink-500"
+        >
           Confirmation's on its way to <span className="text-ink-900">{state.intake.email}</span>. We'll see you then.
-        </p>
+        </Reveal>
       </div>
 
-      <div className="rounded-xl border border-cream-200 bg-white p-4 space-y-3 fade-in-up">
+      <Reveal
+        onMount
+        delay={0.3}
+        y={24}
+        duration={0.6}
+        className="rounded-xl border border-cream-200 bg-white p-4 space-y-3 shadow-soft"
+      >
         {isSeries ? (
           <>
             <div>
@@ -160,31 +178,55 @@ export default function ConfirmationScreen() {
             <PaymentSummary state={state} />
           </>
         )}
-      </div>
+      </Reveal>
 
-      <div className="grid grid-cols-2 gap-2">
+      <Reveal onMount delay={0.9} y={16} duration={0.5} className="grid grid-cols-2 gap-2">
         <button
           type="button"
           onClick={isSeries ? downloadSeriesIcs : downloadSingleIcs}
-          className="rounded-xl px-3 py-2.5 border border-cream-200 bg-white hover:bg-cream-50 text-sm font-medium text-ink-700 flex items-center justify-center gap-1.5"
+          className="rounded-xl px-3 py-2.5 border border-cream-200 bg-white hover:bg-cream-50 text-sm font-medium text-ink-700 flex items-center justify-center gap-1.5 transition-colors duration-[250ms]"
         >
           <CalendarPlus className="w-4 h-4" /> Add to Calendar
         </button>
         <button
           type="button"
           onClick={() => actions.resetAll()}
-          className="rounded-xl px-3 py-2.5 bg-espresso-800 hover:bg-espresso-700 text-cream-100 text-sm font-medium flex items-center justify-center gap-1.5"
+          className="rounded-xl px-3 py-2.5 bg-espresso-800 hover:bg-espresso-700 text-cream-100 text-sm font-medium flex items-center justify-center gap-1.5 transition-colors duration-[250ms]"
         >
           <RefreshCw className="w-4 h-4" /> Book another
         </button>
-      </div>
+      </Reveal>
 
-      <div className="space-y-3 pt-4">
+      <Reveal onMount delay={1.1} y={16} duration={0.5} className="space-y-3 pt-4">
         <div className="text-[10px] uppercase tracking-[0.16em] text-ink-500">Email previews</div>
         <PatientEmail state={state} />
         <SpaEmail state={state} />
-      </div>
+      </Reveal>
     </ScreenChrome>
+  );
+}
+
+// LUMERA-NOTE: scale is generally off-limits on UI elements, but the
+// success icon's gentle scale-in (0.85 → 1.0 + opacity) is the one
+// ceremonial exception for the confirmation moment. Reduced motion
+// renders it static.
+function CheckRing() {
+  const reduced = useReducedMotion();
+  const Wrapper = reduced ? 'div' : motion.div;
+  const props = reduced
+    ? {}
+    : {
+        initial: { opacity: 0, scale: 0.85 },
+        animate: { opacity: 1, scale: 1 },
+        transition: { duration: 0.45, ease: EASE, delay: 0.05 },
+      };
+  return (
+    <Wrapper
+      {...props}
+      className="w-14 h-14 mx-auto rounded-full bg-gold-300/30 flex items-center justify-center mb-3"
+    >
+      <CheckCircle2 className="w-7 h-7 text-gold-600" strokeWidth={2.5} />
+    </Wrapper>
   );
 }
 

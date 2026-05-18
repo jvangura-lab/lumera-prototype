@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { BOOKING_ANCHOR_ID } from './brand.js';
+import { useLenis } from '../motion/LenisProvider.jsx';
 
 export default function MobileBookCTA({ hidden = false }) {
+  const { scrollTo } = useLenis();
   const [showPastHero, setShowPastHero] = useState(false);
 
   useEffect(() => {
@@ -35,12 +37,11 @@ export default function MobileBookCTA({ hidden = false }) {
       const stickyHeader = document.querySelector('header');
       const stickyOffset = stickyHeader ? stickyHeader.offsetHeight : 72;
       const breathingRoom = 16;
-      const y = window.scrollY + heading.getBoundingClientRect().top - stickyOffset - breathingRoom;
-      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+      scrollTo(heading, { offset: -(stickyOffset + breathingRoom), duration: 0.9 });
       return;
     }
     const target = document.getElementById(BOOKING_ANCHOR_ID);
-    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (target) scrollTo(target, { duration: 0.9 });
   };
 
   return (

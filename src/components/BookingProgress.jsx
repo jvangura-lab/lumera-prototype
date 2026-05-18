@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
 import { useBooking, deriveFlow, stepLabel, STEPS } from '../state/BookingContext.jsx';
+import { EASE } from '../motion/tokens.js';
 
 export default function BookingProgress() {
   const { state } = useBooking();
@@ -49,20 +51,31 @@ export default function BookingProgress() {
                 >
                   <span
                     className={
-                      'flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold transition ' +
+                      'relative flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold transition-colors duration-[250ms] ' +
                       (done
                         ? 'bg-accent-strong text-bone'
-                        : active
-                          ? 'bg-accent text-bone'
-                          : 'border border-ink-300 bg-white text-ink-500')
+                        : 'border border-ink-300 bg-white text-ink-500')
                     }
                     aria-hidden
                   >
-                    {done ? <Check className="h-3 w-3" strokeWidth={3} /> : null}
+                    {/* The active gold fill is a single motion element with
+                        shared layoutId, so it slides between chip positions
+                        rather than popping. */}
+                    {active && (
+                      <motion.span
+                        layoutId="booking-progress-active-fill"
+                        className="absolute inset-0 rounded-full bg-accent"
+                        transition={{ duration: 0.35, ease: EASE }}
+                        aria-hidden
+                      />
+                    )}
+                    <span className="relative">
+                      {done ? <Check className="h-3 w-3" strokeWidth={3} /> : null}
+                    </span>
                   </span>
                   <span
                     className={
-                      'font-sans text-[11px] uppercase tracking-eyebrow whitespace-nowrap ' +
+                      'font-sans text-[11px] uppercase tracking-eyebrow whitespace-nowrap transition-colors duration-[250ms] ' +
                       (active
                         ? 'text-ink-900 font-semibold'
                         : done
