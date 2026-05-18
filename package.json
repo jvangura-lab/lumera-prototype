@@ -1,5 +1,5 @@
 {
-  "name": "magnolia-prototype",
+  "name": "lumera-prototype",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -7,8 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "docker:build": "docker build -t magnolia-prototype .",
-    "docker:run": "docker run -p 8080:8080 -e PORT=8080 magnolia-prototype"
+    "docker:build": "docker build -t lumera-prototype .",
+    "docker:run": "docker run -p 8080:8080 -e PORT=8080 lumera-prototype"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

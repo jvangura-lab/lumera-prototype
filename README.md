@@ -54,7 +54,7 @@ The Nginx config in the image:
 
 ```bash
 PROJECT_ID=your-gcp-project
-SERVICE_NAME=magnolia-prototype
+SERVICE_NAME=Lumera-Prototype
 REGION=us-central1
 
 gcloud builds submit --tag "gcr.io/$PROJECT_ID/$SERVICE_NAME"
@@ -77,7 +77,7 @@ gcloud run deploy "$SERVICE_NAME" \
 
 ```bash
 gcloud builds submit --config=cloudbuild.yaml \
-  --substitutions=_SERVICE_NAME=magnolia-prototype,_REGION=us-central1 .
+  --substitutions=_SERVICE_NAME=Lumera-Prototype,_REGION=us-central1 .
 ```
 
 Recommended Cloud Run settings:
@@ -100,7 +100,7 @@ Drop the deployed URL into an iframe:
 
 ```html
 <iframe
-  src="https://magnolia-prototype-xxx.a.run.app/"
+  src="https://Lumera-Prototype-xxx.a.run.app/"
   width="440"
   height="780"
   style="border:0;"
