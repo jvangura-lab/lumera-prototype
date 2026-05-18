@@ -7,14 +7,15 @@ import { useKenBurns } from '../motion/useKenBurns.js';
 import { useParallaxY } from '../motion/useScrollReveal.js';
 import { EASE, STAGGER } from '../motion/tokens.js';
 
+// Larger source so the image stays crisp when full-bleed at full viewport
+// height across desktop, retina, and mobile.
 const HERO_IMAGE_URL =
-  'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1400&q=80';
+  'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=2400&q=85';
 
 export default function PageHero() {
   const reduced = useReducedMotion();
-  // Background photograph: scroll-tied parallax (lags scroll) + scroll-tied
-  // scale on top of an ambient Ken Burns slow zoom. Tuned for a noticeable,
-  // not-subtle effect — speed 0.4 makes the photo lag well behind scroll.
+  // Background photograph: scroll-tied parallax + scroll-tied scale on
+  // top of an ambient Ken Burns slow zoom.
   const photoParallaxRef = useHeroParallax({
     speed: 0.4,
     range: 320,
@@ -22,32 +23,29 @@ export default function PageHero() {
     scaleEnd: 1.14,
   });
   // Ken Burns lives on a child div so its transform doesn't fight the
-  // parallax wrapper. The wrapper handles Y + scale-on-scroll, the inner
-  // div drifts continuously — quicker (9s) and a bit more drift so it
-  // reads as life-when-stationary, not glacial.
+  // parallax wrapper.
   const kenBurnsRef = useKenBurns({ scale: 1.06, drift: 2.8, duration: 9 });
-  // Gradient overlay also parallaxes — slightly faster than the photo
-  // so it shears against it, deepening the depth illusion.
+  // Gradient overlay also parallaxes for depth shear.
   const gradientRef = useParallaxY(0.65, 120);
 
   return (
     <section
       id="hero"
-      className="relative overflow-hidden border-b border-[#E2D6C3] bg-gradient-to-b from-bone to-[#F3ECE0]"
+      className="relative flex min-h-screen items-center overflow-hidden border-b border-[#E2D6C3] bg-bone"
     >
       <div className="absolute inset-0 pointer-events-none">
-        {/* On mount: photograph fades up to full presence (opacity 0 -> 0.9)
-            while sliding ~60px from the right. The cream "white space" on
-            the left shrinks as the image becomes visible. */}
+        {/* Full-bleed photograph. Entrance: fades opacity 0 -> 1 and slides
+            a touch from the right, so the cream visibly recedes as the
+            image arrives on mount. */}
         <motion.div
           initial={reduced ? false : { opacity: 0, x: 60 }}
           animate={reduced ? undefined : { opacity: 1, x: 0 }}
           transition={{ duration: 1.4, ease: EASE, delay: 0.15 }}
-          className="absolute inset-y-[-15%] right-0 w-2/3"
+          className="absolute inset-0"
         >
           <div
             ref={photoParallaxRef}
-            className="absolute inset-0 opacity-[0.9]"
+            className="absolute inset-y-[-15%] inset-x-0"
             style={{ willChange: 'transform' }}
           >
             <div
@@ -55,26 +53,31 @@ export default function PageHero() {
               className="absolute inset-0 bg-cover bg-center"
               style={{
                 backgroundImage: `url("${HERO_IMAGE_URL}")`,
-                maskImage:
-                  'linear-gradient(to left, black 50%, transparent 100%)',
-                WebkitMaskImage:
-                  'linear-gradient(to left, black 50%, transparent 100%)',
                 willChange: 'transform',
               }}
             />
           </div>
         </motion.div>
+        {/* Cream-to-transparent gradient. Left side stays readable for
+            text; image dominates the right. On mobile (no md), the
+            gradient extends further so the narrower viewport still has
+            a clean text gutter. */}
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-gradient-to-r from-bone via-bone/85 to-transparent md:via-bone/75 md:to-bone/0"
+        />
+        {/* Subtle warm radial accent that parallaxes for depth shear. */}
         <div
           ref={gradientRef}
           className="absolute inset-0"
           style={{
             background:
-              'radial-gradient(ellipse at 75% 30%, rgba(184, 153, 104, 0.10) 0%, rgba(251, 248, 242, 0) 55%)',
+              'radial-gradient(ellipse at 78% 35%, rgba(184, 153, 104, 0.10) 0%, rgba(251, 248, 242, 0) 55%)',
             willChange: 'transform',
           }}
         />
       </div>
-      <div className="relative mx-auto max-w-site px-6 py-24 md:px-10 md:py-32">
+      <div className="relative mx-auto w-full max-w-site px-6 py-24 md:px-10 md:py-32">
         <HeroLine
           delay={STAGGER.heroSequence.breadcrumb}
           className="font-sans text-[11px] uppercase tracking-eyebrow text-ink-500"
