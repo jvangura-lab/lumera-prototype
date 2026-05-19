@@ -5,7 +5,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "frame-ancestors 'self' https://rivrsystems.com https://*.rivrsystems.com http://localhost:* https://localhost:*"
+          "value": "frame-ancestors *"
         }
       ]
     }
